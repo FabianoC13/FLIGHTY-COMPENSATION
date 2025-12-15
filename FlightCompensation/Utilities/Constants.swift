@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 enum AppConstants {
     static let cornerRadius: CGFloat = 16
