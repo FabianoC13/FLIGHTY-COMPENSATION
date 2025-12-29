@@ -74,9 +74,6 @@ struct FlightsListView: View {
                     Text(error)
                 }
             }
-            .task {
-                viewModel.loadFlights()
-            }
         }
     }
     
