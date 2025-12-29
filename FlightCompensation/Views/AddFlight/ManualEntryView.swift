@@ -63,6 +63,59 @@ struct ManualEntryView: View {
         
         // Use placeholder airports - these will be updated when we get real flight data
         // For now, we'll use generic airports since we don't have route info yet
+        // Seed test data for DELAY*/CANCEL* codes so UI shows immediate values
+        let trimmed = flightCode.uppercased().trimmingCharacters(in: .whitespaces)
+        if trimmed.starts(with: "DELAY") || trimmed.starts(with: "CANCEL") {
+            let depAirport = Airport(
+                id: UUID(uuidString: "12345678-1234-1234-1234-123456789001") ?? UUID(),
+                code: "MAD",
+                name: "Adolfo Suárez Madrid–Barajas Airport",
+                city: "Madrid",
+                country: "Spain"
+            )
+            
+            let arrAirport = Airport(
+                id: UUID(uuidString: "12345678-1234-1234-1234-123456789002") ?? UUID(),
+                code: "CDG",
+                name: "Charles de Gaulle Airport",
+                city: "Paris",
+                country: "France"
+            )
+            
+            let scheduledDeparture = Calendar.current.date(bySettingHour: 14, minute: 30, second: 0, of: selectedDate) ?? selectedDate
+            let scheduledArrival = Calendar.current.date(byAdding: .hour, value: 2, to: scheduledDeparture) ?? scheduledDeparture
+
+            var status: FlightStatus = .scheduled
+            var currentStatus: FlightStatus = .scheduled
+            var delayEvents: [DelayEvent] = []
+
+            if trimmed.starts(with: "DELAY") {
+                status = .delayed
+                currentStatus = .delayed
+                delayEvents = [DelayEvent(type: .delay, duration: 4 * 3600, actualTime: Calendar.current.date(byAdding: .hour, value: 4, to: scheduledArrival), reason: "Simulated test delay")]
+            } else if trimmed.starts(with: "CANCEL") {
+                status = .cancelled
+                currentStatus = .cancelled
+                delayEvents = [DelayEvent(type: .cancellation, duration: 0, actualTime: nil, reason: "Simulated cancellation")]
+            }
+
+            let flight = Flight(
+                flightNumber: flightNumber,
+                airline: airline,
+                departureAirport: depAirport,
+                arrivalAirport: arrAirport,
+                scheduledDeparture: scheduledDeparture,
+                scheduledArrival: scheduledArrival,
+                status: status,
+                currentStatus: currentStatus,
+                delayEvents: delayEvents
+            )
+
+            viewModel.addFlightManually(flight)
+            dismiss()
+            return
+        }
+
         let depAirport = Airport(
             code: "TBD",
             name: "To be determined",

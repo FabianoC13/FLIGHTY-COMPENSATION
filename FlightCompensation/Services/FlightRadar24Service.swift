@@ -1,4 +1,5 @@
 import Foundation
+import CoreLocation
 
 final class FlightRadar24Service: FlightTrackingService {
     private let apiKey: String
@@ -14,12 +15,109 @@ final class FlightRadar24Service: FlightTrackingService {
     
     func trackFlight(_ flight: Flight) async throws -> FlightStatus {
         let flightNumber = "\(flight.airline.code)\(flight.flightNumber)"
-        return try await getFlightStatus(flightNumber, date: flight.scheduledDeparture)
+        let formattedFlightNumber = flightNumber.uppercased().trimmingCharacters(in: .whitespaces)
+        print("🔍 trackFlight: Flight code = '\(flightNumber)' -> formatted = '\(formattedFlightNumber)'")
+        return try await getFlightStatus(formattedFlightNumber, date: flight.scheduledDeparture)
     }
     
     func getFlightDetails(_ flight: Flight) async throws -> Flight? {
         let flightNumber = "\(flight.airline.code)\(flight.flightNumber)"
-        return try await fetchFlightDetails(flightNumber: flightNumber, existingFlight: flight)
+        let formattedFlightNumber = flightNumber.uppercased().trimmingCharacters(in: .whitespaces)
+        print("🔍 getFlightDetails: Flight code = '\(flightNumber)' -> formatted = '\(formattedFlightNumber)'")
+        
+        // Testing: Return test data for specific flight codes
+        if isTestFlightCode(formattedFlightNumber) {
+            print("🧪 Testing mode: Returning test flight details for \(formattedFlightNumber)")
+            return createTestFlight(flightCode: formattedFlightNumber, existingFlight: flight)
+        }
+        
+        return try await fetchFlightDetails(flightNumber: formattedFlightNumber, existingFlight: flight)
+    }
+    
+    private func isTestFlightCode(_ code: String) -> Bool {
+        return code == "DELAY001" || code == "DELAY002" || code == "CANCEL001"
+    }
+    
+    private func createTestFlight(flightCode: String, existingFlight: Flight) -> Flight {
+        // Create test airports and times for testing codes
+        let depAirport = Airport(
+            id: UUID(uuidString: "12345678-1234-1234-1234-123456789001") ?? UUID(),
+            code: "MAD",
+            name: "Adolfo Suárez Madrid–Barajas Airport",
+            city: "Madrid",
+            country: "Spain",
+            latitude: 40.4983,
+            longitude: -3.5676
+        )
+        
+        let arrAirport = Airport(
+            id: UUID(uuidString: "12345678-1234-1234-1234-123456789002") ?? UUID(),
+            code: "CDG",
+            name: "Charles de Gaulle Airport",
+            city: "Paris",
+            country: "France",
+            latitude: 49.0097,
+            longitude: 2.5479
+        )
+        
+        // Use existing flight times or create reasonable defaults
+        let scheduledDeparture = existingFlight.scheduledDeparture
+        let scheduledArrival = existingFlight.scheduledArrival.timeIntervalSince(existingFlight.scheduledDeparture) > 0
+            ? existingFlight.scheduledArrival
+            : Calendar.current.date(byAdding: .hour, value: 2, to: scheduledDeparture) ?? scheduledDeparture
+        
+        // Determine the proper status and delay events based on the test flight code
+        var status: FlightStatus = .scheduled
+        var currentStatus: FlightStatus = .scheduled
+        var delayEvents: [DelayEvent] = []
+        
+        if flightCode == "DELAY001" {
+            status = .delayed
+            currentStatus = .delayed
+            delayEvents = [
+                DelayEvent(
+                    type: .delay,
+                    duration: 4 * 3600, // 4 hours delay
+                    actualTime: Calendar.current.date(byAdding: .hour, value: 4, to: scheduledArrival),
+                    reason: "Operational delay"
+                )
+            ]
+        } else if flightCode == "DELAY002" {
+            status = .delayed
+            currentStatus = .delayed
+            delayEvents = [
+                DelayEvent(
+                    type: .delay,
+                    duration: 3.5 * 3600, // 3.5 hours delay
+                    actualTime: Calendar.current.date(byAdding: .hour, value: 3, to: scheduledArrival),
+                    reason: "Weather delay"
+                )
+            ]
+        } else if flightCode == "CANCEL001" {
+            status = .cancelled
+            currentStatus = .cancelled
+            delayEvents = [
+                DelayEvent(
+                    type: .cancellation,
+                    duration: 0,
+                    actualTime: nil,
+                    reason: "Flight cancelled by airline"
+                )
+            ]
+        }
+        
+        return Flight(
+            id: existingFlight.id,
+            flightNumber: existingFlight.flightNumber,
+            airline: existingFlight.airline,
+            departureAirport: depAirport,
+            arrivalAirport: arrAirport,
+            scheduledDeparture: scheduledDeparture,
+            scheduledArrival: scheduledArrival,
+            status: status,
+            currentStatus: currentStatus,
+            delayEvents: delayEvents
+        )
     }
     
     func getFlightStatus(_ flightNumber: String, date: Date) async throws -> FlightStatus {
@@ -27,16 +125,17 @@ final class FlightRadar24Service: FlightTrackingService {
         // The API accepts the full flight code: airline code + flight number
         // Examples: "BA178", "FR1234", "LH441"
         let formattedFlightNumber = flightNumber.uppercased().trimmingCharacters(in: .whitespaces)
+        print("🔍 getFlightStatus: Checking flight code '\(formattedFlightNumber)'")
         
-        // Testing: Force delay for specific flight codes
-        if formattedFlightNumber == "DELAY001" || formattedFlightNumber == "DELAY002" {
-            print("🧪 Testing mode: Forcing delay for \(formattedFlightNumber)")
-            return .delayed
-        }
-        
-        if formattedFlightNumber == "CANCEL001" {
-            print("🧪 Testing mode: Forcing cancellation for \(formattedFlightNumber)")
-            return .cancelled
+        // Testing: Force delay for specific flight codes - CHECK FIRST BEFORE API CALL
+        if isTestFlightCode(formattedFlightNumber) {
+            if formattedFlightNumber == "CANCEL001" {
+                print("🧪 Testing mode: Forcing cancellation for \(formattedFlightNumber)")
+                return .cancelled
+            } else {
+                print("🧪 Testing mode: Forcing delay for \(formattedFlightNumber)")
+                return .delayed
+            }
         }
         
         // FlightRadar24 API endpoint for flight status
@@ -403,6 +502,13 @@ final class FlightRadar24Service: FlightTrackingService {
     // Fetch complete flight details including airports and times
     private func fetchFlightDetails(flightNumber: String, existingFlight: Flight) async throws -> Flight? {
         let formattedFlightNumber = flightNumber.uppercased().trimmingCharacters(in: .whitespaces)
+        print("🔍 fetchFlightDetails: Checking flight code '\(formattedFlightNumber)'")
+        
+        // Safety check: Don't call API for test codes
+        if isTestFlightCode(formattedFlightNumber) {
+            print("🧪 Testing mode: Skipping API call for test code \(formattedFlightNumber)")
+            return createTestFlight(flightCode: formattedFlightNumber, existingFlight: existingFlight)
+        }
         
         guard let url = URL(string: "\(baseURL)/flight/list.json") else {
             throw FlightRadar24Error.invalidURL
@@ -466,30 +572,45 @@ final class FlightRadar24Service: FlightTrackingService {
         if let airportData = firstFlight["airport"] as? [String: Any] {
             print("📍 Found airport data in response")
             
-            // Extract origin airport - try different structures
-            var originIATA: String?
-            var originName: String?
-            var originCountry: String?
-            
-            if let origin = airportData["origin"] as? [String: Any] {
-                // Try code.iata
-                if let originCode = origin["code"] as? [String: Any] {
-                    originIATA = originCode["iata"] as? String ?? originCode["icao"] as? String
-                }
-                // Try direct code string
-                if originIATA == nil, let code = origin["code"] as? String {
-                    originIATA = code
+            func extractAirportDetails(from data: [String: Any]) -> (code: String?, name: String?, country: String?) {
+                var code: String?
+                var name: String?
+                var country: String?
+                
+                if let codeObject = data["code"] as? [String: Any] {
+                    code = codeObject["iata"] as? String ?? codeObject["icao"] as? String
                 }
                 
-                if let info = origin["info"] as? [String: Any] {
-                    originName = info["name"] as? String
+                if code == nil, let directCode = data["code"] as? String {
+                    code = directCode
+                }
+                
+                if code == nil, let iata = data["iata"] as? String {
+                    code = iata
+                }
+                
+                if let info = data["info"] as? [String: Any] {
+                    name = info["name"] as? String
                     if let position = info["position"] as? [String: Any],
-                       let country = position["country"] as? [String: Any] {
-                        originCountry = country["name"] as? String
+                       let countryData = position["country"] as? [String: Any] {
+                        country = countryData["name"] as? String
                     }
                 }
                 
-                if let code = originIATA, !code.isEmpty {
+                if name == nil, let directName = data["name"] as? String {
+                    name = directName
+                }
+                
+                if country == nil, let countryData = data["country"] as? [String: Any] {
+                    country = countryData["name"] as? String
+                }
+                
+                return (code, name, country)
+            }
+            
+            if let origin = airportData["origin"] as? [String: Any] {
+                let details = extractAirportDetails(from: origin)
+                if let code = details.code, !code.isEmpty {
                     updatedFlight = Flight(
                         id: existingFlight.id,
                         flightNumber: existingFlight.flightNumber,
@@ -497,9 +618,9 @@ final class FlightRadar24Service: FlightTrackingService {
                         departureAirport: Airport(
                             id: existingFlight.departureAirport.id,
                             code: code,
-                            name: originName ?? code,
+                            name: details.name ?? code,
                             city: code,
-                            country: originCountry ?? ""
+                            country: details.country ?? ""
                         ),
                         arrivalAirport: existingFlight.arrivalAirport,
                         scheduledDeparture: existingFlight.scheduledDeparture,
@@ -512,30 +633,9 @@ final class FlightRadar24Service: FlightTrackingService {
                 }
             }
             
-            // Extract destination airport
-            var destIATA: String?
-            var destName: String?
-            var destCountry: String?
-            
             if let destination = airportData["destination"] as? [String: Any] {
-                // Try code.iata
-                if let destCode = destination["code"] as? [String: Any] {
-                    destIATA = destCode["iata"] as? String ?? destCode["icao"] as? String
-                }
-                // Try direct code string
-                if destIATA == nil, let code = destination["code"] as? String {
-                    destIATA = code
-                }
-                
-                if let info = destination["info"] as? [String: Any] {
-                    destName = info["name"] as? String
-                    if let position = info["position"] as? [String: Any],
-                       let country = position["country"] as? [String: Any] {
-                        destCountry = country["name"] as? String
-                    }
-                }
-                
-                if let code = destIATA, !code.isEmpty {
+                let details = extractAirportDetails(from: destination)
+                if let code = details.code, !code.isEmpty {
                     updatedFlight = Flight(
                         id: updatedFlight.id,
                         flightNumber: updatedFlight.flightNumber,
@@ -544,9 +644,9 @@ final class FlightRadar24Service: FlightTrackingService {
                         arrivalAirport: Airport(
                             id: existingFlight.arrivalAirport.id,
                             code: code,
-                            name: destName ?? code,
+                            name: details.name ?? code,
                             city: code,
-                            country: destCountry ?? ""
+                            country: details.country ?? ""
                         ),
                         scheduledDeparture: updatedFlight.scheduledDeparture,
                         scheduledArrival: updatedFlight.scheduledArrival,
@@ -567,8 +667,33 @@ final class FlightRadar24Service: FlightTrackingService {
             var finalFlight = updatedFlight
             
             // Try scheduled times
+            func extractTimestamp(from value: Any?) -> Int? {
+                if let intValue = value as? Int {
+                    return intValue
+                }
+                
+                if let doubleValue = value as? Double {
+                    return Int(doubleValue)
+                }
+                
+                if let stringValue = value as? String, let intValue = Int(stringValue) {
+                    return intValue
+                }
+                
+                if let nested = value as? [String: Any] {
+                    if let utc = nested["utc"] {
+                        return extractTimestamp(from: utc)
+                    }
+                    if let local = nested["local"] {
+                        return extractTimestamp(from: local)
+                    }
+                }
+                
+                return nil
+            }
+            
             if let scheduled = timeData["scheduled"] as? [String: Any] {
-                if let depTimestamp = scheduled["departure"] as? Int {
+                if let depTimestamp = extractTimestamp(from: scheduled["departure"]) {
                     let depDate = Date(timeIntervalSince1970: TimeInterval(depTimestamp))
                     finalFlight = Flight(
                         id: finalFlight.id,
@@ -585,7 +710,7 @@ final class FlightRadar24Service: FlightTrackingService {
                     print("✅ Updated scheduled departure time: \(depDate)")
                 }
                 
-                if let arrTimestamp = scheduled["arrival"] as? Int {
+                if let arrTimestamp = extractTimestamp(from: scheduled["arrival"]) {
                     let arrDate = Date(timeIntervalSince1970: TimeInterval(arrTimestamp))
                     finalFlight = Flight(
                         id: finalFlight.id,
@@ -601,15 +726,39 @@ final class FlightRadar24Service: FlightTrackingService {
                     )
                     print("✅ Updated scheduled arrival time: \(arrDate)")
                 }
+            } else if let scheduled = timeData["scheduled"] {
+                if let depTimestamp = extractTimestamp(from: scheduled) {
+                    let depDate = Date(timeIntervalSince1970: TimeInterval(depTimestamp))
+                    finalFlight = Flight(
+                        id: finalFlight.id,
+                        flightNumber: finalFlight.flightNumber,
+                        airline: finalFlight.airline,
+                        departureAirport: finalFlight.departureAirport,
+                        arrivalAirport: finalFlight.arrivalAirport,
+                        scheduledDeparture: depDate,
+                        scheduledArrival: finalFlight.scheduledArrival,
+                        status: finalFlight.status,
+                        currentStatus: finalFlight.currentStatus,
+                        delayEvents: finalFlight.delayEvents
+                    )
+                    print("✅ Updated scheduled departure time from scheduled value: \(depDate)")
+                }
             }
             
             // Try real/actual times if available
             if let real = timeData["real"] as? [String: Any] {
-                if let depTimestamp = real["departure"] as? Int {
+                if let depTimestamp = extractTimestamp(from: real["departure"]) {
                     print("   Found real departure time: \(Date(timeIntervalSince1970: TimeInterval(depTimestamp)))")
                 }
-                if let arrTimestamp = real["arrival"] as? Int {
+                if let arrTimestamp = extractTimestamp(from: real["arrival"]) {
                     print("   Found real arrival time: \(Date(timeIntervalSince1970: TimeInterval(arrTimestamp)))")
+                }
+            } else if let actual = timeData["actual"] as? [String: Any] {
+                if let depTimestamp = extractTimestamp(from: actual["departure"]) {
+                    print("   Found actual departure time: \(Date(timeIntervalSince1970: TimeInterval(depTimestamp)))")
+                }
+                if let arrTimestamp = extractTimestamp(from: actual["arrival"]) {
+                    print("   Found actual arrival time: \(Date(timeIntervalSince1970: TimeInterval(arrTimestamp)))")
                 }
             }
             
@@ -641,6 +790,95 @@ final class FlightRadar24Service: FlightTrackingService {
             return .onTime
         } else {
             return .scheduled
+        }
+    }
+
+    // MARK: - Position Updates
+    /// Best-effort polling of FlightRadar24 to extract position info if available. Polls the API a few times and yields any discovered positions.
+    func positionUpdates(_ flight: Flight) -> AsyncStream<FlightPosition> {
+        let formatted = "\(flight.airline.code)\(flight.flightNumber)".uppercased().trimmingCharacters(in: .whitespaces)
+        return AsyncStream { continuation in
+            Task {
+                let maxAttempts = 12
+                for _ in 0..<maxAttempts {
+                    if Task.isCancelled { break }
+                    do {
+                        // Reuse the list.json endpoint to see if it includes position/track info
+                        guard let url = URL(string: "\(baseURL)/flight/list.json") else { break }
+                        var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+                        components?.queryItems = [
+                            URLQueryItem(name: "query", value: formatted),
+                            URLQueryItem(name: "fetchBy", value: "flight"),
+                            URLQueryItem(name: "page", value: "1"),
+                            URLQueryItem(name: "limit", value: "1")
+                        ]
+                        guard let finalURL = components?.url else { break }
+                        var request = URLRequest(url: finalURL)
+                        request.httpMethod = "GET"
+                        if apiKey.contains("|") {
+                            let parts = apiKey.components(separatedBy: "|")
+                            if parts.count == 2 {
+                                request.setValue(parts[0], forHTTPHeaderField: "X-API-Key-Id")
+                                request.setValue(parts[1], forHTTPHeaderField: "X-API-Key-Secret")
+                                request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+                                request.setValue(apiKey, forHTTPHeaderField: "Access-Token")
+                            }
+                        } else {
+                            request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+                            request.setValue(apiKey, forHTTPHeaderField: "Access-Token")
+                            request.setValue(apiKey, forHTTPHeaderField: "X-API-Key")
+                        }
+                        request.setValue("application/json", forHTTPHeaderField: "Accept")
+
+                        let (data, response) = try await URLSession.shared.data(for: request)
+                        guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else { continue }
+                        if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                           let result = json["result"] as? [String: Any],
+                           let response = result["response"] as? [String: Any],
+                           let dataArray = response["data"] as? [[String: Any]],
+                           let first = dataArray.first {
+
+                            // Try to find position fields in multiple possible places
+                            func extractCoordinate(from dict: [String: Any]) -> (Double, Double)? {
+                                if let lat = dict["latitude"] as? Double, let lon = dict["longitude"] as? Double {
+                                    return (lat, lon)
+                                }
+                                if let lat = dict["lat"] as? Double, let lon = dict["lon"] as? Double {
+                                    return (lat, lon)
+                                }
+                                if let pos = dict["position"] as? [String: Any] {
+                                    return extractCoordinate(from: pos)
+                                }
+                                if let track = dict["track"] as? [String: Any] {
+                                    return extractCoordinate(from: track)
+                                }
+                                return nil
+                            }
+
+                            if let coordTuple = extractCoordinate(from: first) {
+                                let lat = coordTuple.0
+                                let lon = coordTuple.1
+                                var heading: Double? = nil
+                                var altitude: Double? = nil
+                                if let track = first["track"] as? [String: Any] {
+                                    heading = track["direction"] as? Double ?? track["heading"] as? Double
+                                }
+                                if let pos = first["position"] as? [String: Any] {
+                                    altitude = pos["altitude"] as? Double ?? pos["alt"] as? Double
+                                }
+                                let position = FlightPosition(latitude: lat, longitude: lon, altitude: altitude, heading: heading, speed: nil, timestamp: Date())
+                                continuation.yield(position)
+                            }
+                        }
+                    } catch {
+                        // ignore and try again
+                    }
+
+                    try? await Task.sleep(nanoseconds: 1_000_000_000) // 1s
+                }
+
+                continuation.finish()
+            }
         }
     }
 }
@@ -772,4 +1010,3 @@ struct FlightRadar24GenericStatus: Codable {
 struct FlightRadar24GenericStatusDetails: Codable {
     let text: String?
 }
-
