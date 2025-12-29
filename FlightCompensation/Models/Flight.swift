@@ -51,6 +51,30 @@ struct Flight: Codable, Equatable, Hashable, Identifiable {
     var latestDelayEvent: DelayEvent? {
         delayEvents.last
     }
+    
+    // MARK: - Claim Status
+    var claimStatus: ClaimStatus = .notStarted
+    var claimReference: String?
+}
+
+enum ClaimStatus: String, Codable, CaseIterable {
+    case notStarted = "Not Started"
+    case airlineClaimSubmitted = "Airline Contacted"
+    case airlineRejected = "Airline Appeal"
+    case aesaSubmitted = "AESA Submitted"
+    case approved = "Approved"
+    case paid = "Paid"
+    
+    var colorHex: String {
+        switch self {
+        case .notStarted: return "#808080" // Gray
+        case .airlineClaimSubmitted: return "#3498DB" // Blue
+        case .airlineRejected: return "#E74C3C" // Red (Action Needed)
+        case .aesaSubmitted: return "#9B59B6" // Purple (Official)
+        case .approved: return "#2ECC71" // Green
+        case .paid: return "#FFD700" // Gold
+        }
+    }
 }
 
 

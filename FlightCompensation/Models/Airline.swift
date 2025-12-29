@@ -18,6 +18,7 @@ struct Airline: Codable, Equatable, Hashable, Identifiable {
         let euCodes = ["FR", "BA", "LH", "AF", "KL", "IB", "VY", "SN", "LX", "OS", "TP", "DY", "U2"]
         return euCodes.contains(code)
     }
+    
 }
 
 

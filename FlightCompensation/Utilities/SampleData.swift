@@ -1,6 +1,87 @@
 import Foundation
 
 extension Flight {
+    static var demoFlights: [Flight] {
+        let calendar = Calendar.current
+        let today = Date()
+        
+        func date(dayOffset: Int, hour: Int, minute: Int) -> Date {
+            let baseDate = calendar.date(byAdding: .day, value: dayOffset, to: today) ?? today
+            return calendar.date(bySettingHour: hour, minute: minute, second: 0, of: baseDate) ?? baseDate
+        }
+        
+        func buildFlight(
+            airlineCode: String,
+            airlineName: String,
+            flightNumber: String,
+            departure: Airport,
+            arrival: Airport,
+            departureDayOffset: Int,
+            departureHour: Int,
+            departureMinute: Int,
+            durationHours: Int,
+            status: FlightStatus,
+            delayHours: Double? = nil
+        ) -> Flight {
+            let scheduledDeparture = date(dayOffset: departureDayOffset, hour: departureHour, minute: departureMinute)
+            let scheduledArrival = calendar.date(byAdding: .hour, value: durationHours, to: scheduledDeparture) ?? scheduledDeparture
+            var delayEvents: [DelayEvent] = []
+            
+            if let delayHours {
+                delayEvents = [
+                    DelayEvent(
+                        type: status == .cancelled ? .cancellation : .delay,
+                        duration: delayHours * 3600.0,
+                        actualTime: status == .cancelled ? nil : Date(),
+                        reason: status == .cancelled ? "Flight cancelled by airline" : "Operational delay"
+                    )
+                ]
+            }
+            
+            return Flight(
+                flightNumber: flightNumber,
+                airline: Airline(code: airlineCode, name: airlineName),
+                departureAirport: departure,
+                arrivalAirport: arrival,
+                scheduledDeparture: scheduledDeparture,
+                scheduledArrival: scheduledArrival,
+                status: status,
+                currentStatus: status,
+                delayEvents: delayEvents
+            )
+        }
+        
+        let lhr = Airport(code: "LHR", name: "Heathrow Airport", city: "London", country: "UK", latitude: 51.4700, longitude: -0.4543)
+        let cdg = Airport(code: "CDG", name: "Charles de Gaulle Airport", city: "Paris", country: "France", latitude: 49.0097, longitude: 2.5479)
+        let fra = Airport(code: "FRA", name: "Frankfurt Airport", city: "Frankfurt", country: "Germany", latitude: 50.0379, longitude: 8.5622)
+        let ams = Airport(code: "AMS", name: "Amsterdam Airport Schiphol", city: "Amsterdam", country: "Netherlands", latitude: 52.3105, longitude: 4.7683)
+        let mad = Airport(code: "MAD", name: "Adolfo Suárez Madrid–Barajas Airport", city: "Madrid", country: "Spain", latitude: 40.4839, longitude: -3.5680)
+        let bcn = Airport(code: "BCN", name: "Barcelona–El Prat Airport", city: "Barcelona", country: "Spain", latitude: 41.2974, longitude: 2.0833)
+        let fco = Airport(code: "FCO", name: "Leonardo da Vinci–Fiumicino Airport", city: "Rome", country: "Italy", latitude: 41.7999, longitude: 12.2462)
+        
+        let jfk = Airport(code: "JFK", name: "John F. Kennedy International Airport", city: "New York", country: "USA", latitude: 40.6413, longitude: -73.7781)
+        let lax = Airport(code: "LAX", name: "Los Angeles International Airport", city: "Los Angeles", country: "USA", latitude: 33.9416, longitude: -118.4085)
+        let dxb = Airport(code: "DXB", name: "Dubai International Airport", city: "Dubai", country: "UAE", latitude: 25.2532, longitude: 55.3657)
+        let sin = Airport(code: "SIN", name: "Singapore Changi Airport", city: "Singapore", country: "Singapore", latitude: 1.3644, longitude: 103.9915)
+        let nrt = Airport(code: "NRT", name: "Narita International Airport", city: "Tokyo", country: "Japan", latitude: 35.7720, longitude: 140.3929)
+        
+        return [
+            // EU/UK flights (5 total, 3 delayed for eligibility)
+            buildFlight(airlineCode: "BA", airlineName: "British Airways", flightNumber: "delay001", departure: lhr, arrival: cdg, departureDayOffset: 1, departureHour: 9, departureMinute: 15, durationHours: 2, status: .delayed, delayHours: 4.0),
+            buildFlight(airlineCode: "LH", airlineName: "Lufthansa", flightNumber: "202", departure: fra, arrival: ams, departureDayOffset: 1, departureHour: 11, departureMinute: 30, durationHours: 2, status: .delayed, delayHours: 3.5),
+            buildFlight(airlineCode: "FR", airlineName: "Ryanair", flightNumber: "303", departure: mad, arrival: bcn, departureDayOffset: 2, departureHour: 7, departureMinute: 45, durationHours: 1, status: .delayed, delayHours: 3.0),
+            buildFlight(airlineCode: "VY", airlineName: "Vueling", flightNumber: "404", departure: bcn, arrival: fco, departureDayOffset: 2, departureHour: 14, departureMinute: 20, durationHours: 2, status: .onTime),
+            buildFlight(airlineCode: "KL", airlineName: "KLM", flightNumber: "505", departure: ams, arrival: cdg, departureDayOffset: 3, departureHour: 16, departureMinute: 0, durationHours: 1, status: .onTime),
+            
+            // Non-EU flights (5 total, delayed but not eligible due to jurisdiction)
+            buildFlight(airlineCode: "DL", airlineName: "Delta Air Lines", flightNumber: "606", departure: jfk, arrival: lax, departureDayOffset: 1, departureHour: 13, departureMinute: 10, durationHours: 6, status: .delayed, delayHours: 3.5),
+            buildFlight(airlineCode: "EK", airlineName: "Emirates", flightNumber: "707", departure: dxb, arrival: sin, departureDayOffset: 2, departureHour: 22, departureMinute: 5, durationHours: 7, status: .delayed, delayHours: 4.0),
+            buildFlight(airlineCode: "SQ", airlineName: "Singapore Airlines", flightNumber: "808", departure: sin, arrival: nrt, departureDayOffset: 3, departureHour: 8, departureMinute: 50, durationHours: 7, status: .delayed, delayHours: 3.2),
+            buildFlight(airlineCode: "UA", airlineName: "United Airlines", flightNumber: "909", departure: lax, arrival: jfk, departureDayOffset: 3, departureHour: 12, departureMinute: 40, durationHours: 5, status: .delayed, delayHours: 3.1),
+            buildFlight(airlineCode: "AA", airlineName: "American Airlines", flightNumber: "1001", departure: jfk, arrival: lax, departureDayOffset: 4, departureHour: 6, departureMinute: 30, durationHours: 6, status: .delayed, delayHours: 3.8)
+        ]
+    }
+    
     static var sampleDelayedFlight: Flight {
         let airline = Airline(code: "FR", name: "Ryanair")
         let departure = Airport(code: "MAD", name: "Adolfo Suárez Madrid–Barajas Airport", city: "Madrid", country: "Spain")
@@ -51,4 +132,3 @@ extension Flight {
         )
     }
 }
-

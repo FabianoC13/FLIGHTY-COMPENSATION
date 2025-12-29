@@ -1,62 +1,78 @@
 import SwiftUI
+import VisionKit
 
 struct TicketScanView: View {
     @ObservedObject var viewModel: AddFlightViewModel
     @Environment(\.dismiss) private var dismiss
     
     @State private var isScanning = false
+    @State private var scannedCode: String?
+    @State private var showConfirmation = false
+    @State private var scannerID = UUID() // Force reset
     
     var body: some View {
         NavigationStack {
             ZStack {
                 Color.black.ignoresSafeArea()
                 
-                VStack(spacing: AppConstants.largeSpacing) {
-                    Text("Scan your boarding pass")
-                        .font(.system(size: 20, weight: .semibold))
-                        .foregroundColor(.white)
-                    
-                    Text("Position your ticket within the frame")
-                        .font(.system(size: 16))
-                        .foregroundColor(.white.opacity(0.7))
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, AppConstants.spacing)
-                    
-                    // Camera view placeholder
-                    RoundedRectangle(cornerRadius: AppConstants.cardCornerRadius)
-                        .stroke(Color.white.opacity(0.5), lineWidth: 2)
-                        .frame(height: 400)
-                        .overlay(
-                            VStack {
-                                Image(systemName: "camera.fill")
-                                    .font(.system(size: 48))
-                                    .foregroundColor(.white.opacity(0.5))
-                                Text("Camera view")
-                                    .font(.system(size: 16))
-                                    .foregroundColor(.white.opacity(0.5))
-                                    .padding(.top, 8)
+                if DataScannerViewController.isSupported && DataScannerViewController.isAvailable {
+                    // Live Camera Scanner
+                    LiveTextScanner(
+                        onFlightCodeDetected: { code in
+                            if scannedCode == nil {
+                                scannedCode = code
+                                showConfirmation = true
                             }
-                        )
-                        .padding(.horizontal, AppConstants.spacing)
+                        },
+                        onCancel: {
+                            dismiss()
+                        }
+                    )
+                    .id(scannerID) // Forces recreation on retry
+                    .ignoresSafeArea()
                     
-                    Button(action: {
-                        // In a real app, this would trigger OCR scanning
-                        // For now, create a mock flight
-                        let mockFlight = createMockFlightFromScan()
-                        viewModel.addFlightFromScan(mockFlight)
-                        dismiss()
-                    }) {
-                        Text("Capture")
-                            .font(.system(size: 17, weight: .semibold))
+                    // Overlay
+                    VStack {
+                        Text("Scan Boarding Pass")
+                            .font(.headline)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 16)
+                            .background(.ultraThinMaterial)
+                            .cornerRadius(20)
+                            .padding(.top, 40)
+                        
+                        Spacer()
+                        
+                        Text("Tap the flight number to select (e.g. BA123)")
                             .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
-                            .background(Color.accentColor)
-                            .cornerRadius(AppConstants.cardCornerRadius)
+                            .shadow(radius: 2)
+                            .padding(.bottom, 60)
                     }
-                    .padding(.horizontal, AppConstants.spacing)
+                } else {
+                    // Fallback for Simulator / Unsupported Devices
+                    VStack(spacing: AppConstants.largeSpacing) {
+                        Image(systemName: "camera.fill")
+                            .font(.system(size: 60))
+                            .foregroundColor(.white.opacity(0.3))
+                        
+                        Text("Scanner not available")
+                            .font(.title3)
+                            .foregroundColor(.white)
+                        
+                        Text("This device or simulator does not support Live Text scanning. Please use the manual entry or simulate a scan below.")
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(.white.opacity(0.7))
+                            .padding()
+                        
+                        Button("Simulate Scan (BA123)") {
+                            scannedCode = "BA123"
+                            showConfirmation = true
+                        }
+                        .padding()
+                        .background(Color.white.opacity(0.1))
+                        .cornerRadius(12)
+                    }
                 }
-                .padding(.vertical, AppConstants.largeSpacing)
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -67,29 +83,52 @@ struct TicketScanView: View {
                     .foregroundColor(.white)
                 }
             }
+            .alert("Flight Detected", isPresented: $showConfirmation) {
+                Button("Add Flight") {
+                    if let code = scannedCode {
+                        let flight = createFlightFromCode(code)
+                        viewModel.addFlightFromScan(flight)
+                        dismiss()
+                    }
+                }
+                Button("Retry", role: .cancel) {
+                    scannedCode = nil
+                    scannerID = UUID() // Reset scanner
+                }
+            } message: {
+                Text("Do you want to add flight \(scannedCode ?? "")?")
+            }
         }
     }
     
-    private func createMockFlightFromScan() -> Flight {
-        // Mock flight data - in real app, this would come from OCR
-        let airline = Airline(code: "BA", name: "British Airways")
-        let depAirport = Airport(code: "LHR", name: "Heathrow Airport", city: "London", country: "UK")
-        let arrAirport = Airport(code: "CDG", name: "Charles de Gaulle Airport", city: "Paris", country: "France")
+    private func createFlightFromCode(_ code: String) -> Flight {
+        // Simple parser: Split Letters and Numbers
+        // E.g. "BA123" -> "BA", "123"
+        let range = code.rangeOfCharacter(from: CharacterSet.decimalDigits)
+        var airlineCode = "XX"
+        var number = "0000"
         
-        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date()
-        let scheduledDeparture = Calendar.current.date(bySettingHour: 14, minute: 30, second: 0, of: tomorrow) ?? tomorrow
-        var dateComponents = DateComponents()
-        dateComponents.hour = 1
-        dateComponents.minute = 30
-        let scheduledArrival = Calendar.current.date(byAdding: dateComponents, to: scheduledDeparture) ?? scheduledDeparture
+        if let range = range {
+            airlineCode = String(code[..<range.lowerBound])
+            number = String(code[range.lowerBound...])
+        }
+        
+        let airline = Airline(code: airlineCode, name: "Unknown Airline")
+        // Use dummy airports; tracking service will update them
+        let depAirport = Airport(code: "UNK", name: "Origin", city: "Unknown", country: "")
+        let arrAirport = Airport(code: "UNK", name: "Destination", city: "Unknown", country: "")
+        
+        // Default to today/tomorrow logic
+        let now = Date()
+        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: now) ?? now
         
         return Flight(
-            flightNumber: "123",
+            flightNumber: number,
             airline: airline,
-            departureAirport: depAirport,
-            arrivalAirport: arrAirport,
-            scheduledDeparture: scheduledDeparture,
-            scheduledArrival: scheduledArrival
+            departureAirport: depAirport, // Will be auto-corrected by Service
+            arrivalAirport: arrAirport,   // Will be auto-corrected by Service
+            scheduledDeparture: tomorrow, // Default to tomorrow
+            scheduledArrival: tomorrow.addingTimeInterval(3600*2)
         )
     }
 }
