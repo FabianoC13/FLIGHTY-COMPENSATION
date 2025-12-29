@@ -1,6 +1,18 @@
 import Foundation
 
 final class MockFlightTrackingService: FlightTrackingService {
+    private let predefinedStatuses: [String: FlightStatus] = [
+        "BA101": .delayed,
+        "LH202": .delayed,
+        "FR303": .delayed,
+        "VY404": .onTime,
+        "KL505": .onTime,
+        "DL606": .delayed,
+        "EK707": .delayed,
+        "SQ808": .delayed,
+        "UA909": .delayed,
+        "AA1001": .delayed
+    ]
     
     func getFlightDetails(_ flight: Flight) async throws -> Flight? {
         // Return nil - mock service doesn't update flight details
@@ -10,6 +22,11 @@ final class MockFlightTrackingService: FlightTrackingService {
     func trackFlight(_ flight: Flight) async throws -> FlightStatus {
         // Simulate network delay
         try await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
+        
+        let flightCode = "\(flight.airline.code)\(flight.flightNumber)"
+        if let status = predefinedStatuses[flightCode] {
+            return status
+        }
         
         // Simulate realistic status updates based on flight time
         let now = Date()
@@ -38,6 +55,10 @@ final class MockFlightTrackingService: FlightTrackingService {
         // Simulate network delay
         try await Task.sleep(nanoseconds: 500_000_000)
         
+        if let status = predefinedStatuses[flightNumber] {
+            return status
+        }
+        
         // Mock status based on flight number hash for consistency
         let hash = abs(flightNumber.hashValue)
         
@@ -55,5 +76,3 @@ final class MockFlightTrackingService: FlightTrackingService {
         }
     }
 }
-
-

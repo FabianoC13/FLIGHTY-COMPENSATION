@@ -19,12 +19,13 @@ final class FlightsListViewModel: ObservableObject {
         errorMessage = nil
         
         // In a real app, this would load from persistence/storage
-        // For now, start with empty array
+        // For now, start with empty array - user must add flights manually
         Task {
             // Simulate loading
             try? await Task.sleep(nanoseconds: 300_000_000)
             await MainActor.run {
                 isLoading = false
+                // No demo flights - user must add flights manually
             }
         }
     }
@@ -71,4 +72,3 @@ final class FlightsListViewModel: ObservableObject {
         }
     }
 }
-
