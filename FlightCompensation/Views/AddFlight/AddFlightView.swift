@@ -109,7 +109,10 @@ struct AddFlightMethodButton: View {
     let action: () -> Void
     
     var body: some View {
-        Button(action: action) {
+        Button(action: {
+            HapticsManager.shared.impact(style: isPrimary ? .medium : .light)
+            action()
+        }) {
             HStack(spacing: AppConstants.spacing) {
                 Image(systemName: icon)
                     .font(.system(size: 24))
@@ -130,8 +133,8 @@ struct AddFlightMethodButton: View {
                 Spacer()
                 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(isPrimary ? .white.opacity(0.7) : .secondary)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundColor(isPrimary ? .white.opacity(0.7) : .secondary)
             }
             .padding(AppConstants.cardPadding)
             .background(isPrimary ? Color.accentColor : Color(.systemBackground))

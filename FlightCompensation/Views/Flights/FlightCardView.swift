@@ -6,44 +6,80 @@ struct FlightCardView: View {
     
     var body: some View {
         Button(action: onTap) {
-            HStack(spacing: AppConstants.spacing) {
-                // Airline logo placeholder
+            HStack(spacing: 20) {
+                // Airline Logo / Placeholder
                 Circle()
-                    .fill(Color.gray.opacity(0.2))
+                    .fill(Color.white.opacity(0.1))
                     .frame(width: 50, height: 50)
                     .overlay(
                         Text(flight.airline.code)
-                            .font(.system(size: 12, weight: .semibold))
-                            .foregroundColor(.secondary)
+                            .font(.system(size: 14, weight: .bold, design: .rounded))
+                            .foregroundStyle(PremiumTheme.electricBlue)
+                    )
+                    .overlay(
+                        Circle().stroke(Color.white.opacity(0.1), lineWidth: 1)
                     )
                 
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 6) {
                     Text(flight.route)
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(.primary)
+                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
                     
-                    Text(flight.airline.name)
-                        .font(.system(size: 14))
-                        .foregroundColor(.secondary)
+                    HStack(spacing: 6) {
+                        Image(systemName: "airplane")
+                            .font(.caption)
+                            .foregroundStyle(.white.opacity(0.5))
+                            
+                        Text(flight.airline.name)
+                            .font(.subheadline)
+                            .foregroundStyle(.white.opacity(0.7))
+                    }
                     
-                    Text(flight.displayFlightNumber)
-                        .font(.system(size: 12))
-                        .foregroundColor(.secondary)
+                    Text("#\(flight.displayFlightNumber)")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(PremiumTheme.electricBlue.opacity(0.8))
                 }
                 
                 Spacer()
                 
                 // Status badge
-                StatusBadge(status: flight.currentStatus)
+                // Status badges
+                VStack(alignment: .trailing, spacing: 8) {
+                    StatusBadge(status: flight.currentStatus)
+                    
+                    if flight.claimStatus != .notStarted {
+                        ClaimStatusBadge(status: flight.claimStatus)
+                    }
+                }
             }
-            .padding(AppConstants.cardPadding)
-            .background(Color(.systemBackground))
-            .cornerRadius(AppConstants.cardCornerRadius)
-            .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 2)
+            .padding(20)
+            .glassCard(cornerRadius: 24)
         }
         .buttonStyle(PlainButtonStyle())
         .transition(.opacity.combined(with: .move(edge: .leading)))
         .animation(.easeInOut(duration: 0.3), value: flight.currentStatus)
+    }
+}
+
+struct ClaimStatusBadge: View {
+    let status: ClaimStatus
+    
+    var body: some View {
+        Text(status.rawValue.uppercased())
+            .font(.system(size: 9, weight: .bold))
+            .foregroundColor(.white)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(
+                Capsule()
+                    .fill(Color(hex: status.colorHex))
+            )
+            .overlay(
+                Capsule()
+                    .stroke(Color.white.opacity(0.3), lineWidth: 1)
+            )
+            .shadow(color: Color(hex: status.colorHex).opacity(0.3), radius: 4)
     }
 }
 
@@ -52,38 +88,18 @@ struct StatusBadge: View {
     
     var body: some View {
         Text(status.displayName)
-            .font(.system(size: 12, weight: .medium))
+            .font(.system(size: 11, weight: .bold))
             .foregroundColor(.white)
-            .padding(.horizontal, 12)
+            .padding(.horizontal, 10)
             .padding(.vertical, 6)
-            .background(Color(hex: status.colorHex))
-            .cornerRadius(12)
+            .background(
+                Capsule()
+                    .fill(Color(hex: status.colorHex).opacity(0.8))
+            )
+            .overlay(
+                Capsule()
+                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
+            )
+            .shadow(color: Color(hex: status.colorHex).opacity(0.4), radius: 5)
     }
 }
-
-extension Color {
-    init(hex: String) {
-        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        var int: UInt64 = 0
-        Scanner(string: hex).scanHexInt64(&int)
-        let a, r, g, b: UInt64
-        switch hex.count {
-        case 3: // RGB (12-bit)
-            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
-        case 6: // RGB (24-bit)
-            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
-        case 8: // ARGB (32-bit)
-            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
-        default:
-            (a, r, g, b) = (255, 0, 0, 0)
-        }
-        self.init(
-            .sRGB,
-            red: Double(r) / 255,
-            green: Double(g) / 255,
-            blue: Double(b) / 255,
-            opacity: Double(a) / 255
-        )
-    }
-}
-
