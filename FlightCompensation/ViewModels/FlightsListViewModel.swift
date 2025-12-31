@@ -32,6 +32,7 @@ final class FlightsListViewModel: ObservableObject {
             await MainActor.run {
                 self.flights = savedFlights
                 isLoading = false
+                // No demo flights - user must add flights manually
             }
             
             // Refresh status for all loaded flights

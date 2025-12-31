@@ -1,19 +1,16 @@
 import Foundation
 
 enum Config {
-    // ⚠️ REPLACE THIS WITH YOUR REAL API KEY ⚠️
-    // You can get one at https://flightradar24.com/premium
-    // Format: "key_id|key_secret" OR "your_access_token"
-    private static let placeholderAPIKey = "YOUR_REAL_API_KEY_HERE"
+    private static let placeholderAPIKey = "YOUR_KEY|YOUR_SECRET"
     
     // FlightRadar24 API Key
+    // Format: {key-id}|{key-secret}
     static var flightRadar24APIKey: String {
-        // 1. Check Environment Variables (Best for CI/CD)
         if let key = ProcessInfo.processInfo.environment["FLIGHT_RADAR24_API_KEY"], !key.isEmpty {
             return key
         }
-        
-        // 2. Fallback to the hardcoded key above (Easier for local dev)
+
+        // Provide a safe placeholder so a real key is never committed by accident
         return placeholderAPIKey
     }
     
@@ -27,7 +24,3 @@ enum Config {
         return flightRadar24APIKey != placeholderAPIKey
     }
 }
-
-
-
-
