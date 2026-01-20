@@ -189,7 +189,6 @@ final class MockFlightTrackingService: FlightTrackingService {
                     let steps = 240
                     let intervalSeconds = 0.05
                     var lastCoord = originCoord
-                    var lastTimestamp = Date()
 
                     // Simulate cruising altitude (meters) and descent
                     let originAlt = 11000.0 // meters
@@ -215,7 +214,6 @@ final class MockFlightTrackingService: FlightTrackingService {
                         continuation.yield(pos)
 
                         lastCoord = coord
-                        lastTimestamp = now
 
                         try await Task.sleep(nanoseconds: UInt64(intervalSeconds * 1_000_000_000))
                     }

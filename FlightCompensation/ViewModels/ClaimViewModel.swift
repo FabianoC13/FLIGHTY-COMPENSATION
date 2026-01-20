@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 import Combine
+import FirebaseFirestore
 
 enum ClaimStep: Int, CaseIterable {
     case passengerDetails = 0
@@ -188,9 +189,92 @@ final class ClaimViewModel: ObservableObject {
             isSuccess = true
             claimReference = response.claimReference
             
+            // Save Master Document
+            _ = ClaimDocumentService.shared.savePDF(data: masterPdfData, claimReference: response.claimReference, type: .masterAuthorization)
+
             // Save secondary document if exists
             if let letterData = airlineLetterData {
                 _ = ClaimDocumentService.shared.savePDF(data: letterData, claimReference: response.claimReference, type: .airlineComplaint)
+            }
+            
+            // Queue email for the local email bot (Simulator only)
+            #if targetEnvironment(simulator)
+            let isTestFlight = flight.flightNumber.uppercased() == "DELAY001"
+            
+            // For test flights: send only to company test email
+            // For real flights: send to airline + CC company
+            let recipientEmail = isTestFlight ? "fabianocalvaye@gmail.com" : flight.airline.claimEmail
+            let ccEmail: String? = isTestFlight ? nil : "fabianocalvaye@gmail.com" // Later: claims@flightcompensation.app
+            
+            let subject = "Formal Complaint - Flight \(flight.displayFlightNumber) - Ref: \(response.claimReference)"
+            let body = """
+            To whom it may concern,
+            
+            Please find attached my formal complaint regarding flight \(flight.displayFlightNumber).
+            
+            Claim Reference: \(response.claimReference)
+            
+            I request that you process this claim in accordance with Regulation (EC) No 261/2004.
+            
+            Sincerely,
+            \(userProfile.firstName) \(userProfile.lastName)
+            """
+            
+            // Build attachments with actual PDF data
+            var emailAttachments: [EmailService.EmailAttachment] = []
+            emailAttachments.append(EmailService.EmailAttachment(
+                filename: ClaimDocumentType.masterAuthorization.filename(for: response.claimReference),
+                data: masterPdfData
+            ))
+            if let letterData = airlineLetterData {
+                emailAttachments.append(EmailService.EmailAttachment(
+                    filename: ClaimDocumentType.airlineComplaint.filename(for: response.claimReference),
+                    data: letterData
+                ))
+            }
+            
+            // Send email via local HTTP server
+            Task {
+                let sent = await EmailService.shared.sendEmail(
+                    to: recipientEmail,
+                    cc: ccEmail,
+                    subject: subject,
+                    body: body,
+                    attachments: emailAttachments
+                )
+                if sent {
+                    print("📧 Email sent successfully via local server")
+                } else {
+                    print("⚠️ Failed to send email via local server")
+                }
+            }
+            #endif
+            
+            // 3. Cloud Storage & Firestore
+            Task {
+                // Upload Master Document
+                let masterURL = await ClaimDocumentService.shared.uploadPDF(
+                    data: masterPdfData,
+                    claimReference: response.claimReference,
+                    type: .masterAuthorization
+                )
+                
+                // Upload Airline Letter if exists
+                var letterURL: String? = nil
+                if let letterData = airlineLetterData {
+                    letterURL = await ClaimDocumentService.shared.uploadPDF(
+                        data: letterData,
+                        claimReference: response.claimReference,
+                        type: .airlineComplaint
+                    )
+                }
+                
+                // Save Claim to Firestore with Cloud Links
+                saveClaimToFirestore(
+                    reference: response.claimReference,
+                    masterDocURL: masterURL,
+                    airlineLetterURL: letterURL
+                )
             }
             
             // For the Airline Flow, the "Claim Status" should be set to .airlineClaimSubmitted
@@ -200,6 +284,40 @@ final class ClaimViewModel: ObservableObject {
         } catch {
             submissionError = "Submission failed: \(error.localizedDescription)"
             isSubmitting = false
+        }
+    }
+    
+    private func saveClaimToFirestore(reference: String, masterDocURL: String?, airlineLetterURL: String?) {
+        let db = Firestore.firestore()
+        
+        // Prepare data for Firestore
+        // We'll store a subset of the claim request in Firestore for the user to see
+        var claimData: [String: Any] = [
+            "claimReference": reference,
+            "flightNumber": flight.flightNumber,
+            "airline": flight.airline.name,
+            "route": "\(flight.departureAirport.code) → \(flight.arrivalAirport.code)",
+            "status": "submitted",
+            "submissionDate": Timestamp(date: Date()),
+            "passengerName": "\(claimRequest.passengerDetails.firstName) \(claimRequest.passengerDetails.lastName)",
+            "claimType": claimType == .airline ? "airline" : "aesa"
+        ]
+        
+        // Add cloud links if available
+        if let masterURL = masterDocURL {
+            claimData["masterDocURL"] = masterURL
+        }
+        if let letterURL = airlineLetterURL {
+            claimData["airlineLetterURL"] = letterURL
+        }
+        
+        // Use the claim reference as the document ID
+        db.collection("claims").document(reference).setData(claimData) { error in
+            if let error = error {
+                print("❌ Error saving claim to Firestore: \(error.localizedDescription)")
+            } else {
+                print("✅ Claim successfully saved to Firestore: \(reference)")
+            }
         }
     }
 }
