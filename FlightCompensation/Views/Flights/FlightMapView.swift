@@ -40,7 +40,8 @@ struct FlightMapView: View {
                         .padding(8)
                         .background(Circle().fill(Color.accentColor))
                         .shadow(radius: 4)
-                        .rotationEffect(.degrees(plane.heading ?? 0))
+                        // SF Symbol "airplane" points right (90°), heading 0° = North, so subtract 90°
+                        .rotationEffect(.degrees((plane.heading ?? 0) - 90))
                 }
                 .annotationTitles(.hidden)
             }

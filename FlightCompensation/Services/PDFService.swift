@@ -142,8 +142,6 @@ final class PDFService {
     
     /// Generates a simple Complaint Letter to the Airline (Not signed, just a formal notice)
     func generateAirlineComplaintPDF(userProfile: UserProfile, flight: Flight) throws -> Data {
-        let title = "SOLICITUD DE COMPENSACIÓN / COMPENSATION CLAIM"
-        
         let format = UIGraphicsPDFRendererFormat()
         format.documentInfo = [kCGPDFContextCreator: "FlightCompensation App"] as [String: Any]
         let renderer = UIGraphicsPDFRenderer(bounds: CGRect(x: 0, y: 0, width: 595.2, height: 841.8), format: format)

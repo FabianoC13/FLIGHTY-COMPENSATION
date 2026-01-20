@@ -23,21 +23,36 @@ final class FlightsListViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
         
-        // In a real app, this would load from persistence/storage
-        // For now, start with empty array - user must add flights manually
         Task {
-            // Load from storage
-            let savedFlights = flightStorageService.load()
-            
+            // 1. Initial Load from Local Cache (Fast)
+            let cachedFlights = flightStorageService.load()
             await MainActor.run {
-                self.flights = savedFlights
-                isLoading = false
-                // No demo flights - user must add flights manually
+                self.flights = cachedFlights
             }
             
-            // Refresh status for all loaded flights
-            for flight in savedFlights {
-                refreshFlightStatus(flight)
+            do {
+                // 2. Async Sync with Cloud (Authoritative)
+                let cloudFlights = try await flightStorageService.fetchFlights()
+                
+                await MainActor.run {
+                    self.flights = cloudFlights
+                    self.isLoading = false
+                }
+                
+                // Refresh status for all loaded flights
+                for flight in cloudFlights {
+                    refreshFlightStatus(flight)
+                }
+            } catch {
+                await MainActor.run {
+                    print("⚠️ Cloud sync failed: \(error.localizedDescription)")
+                    // Keep showing local flights if cloud fails
+                    self.isLoading = false
+                    // Don't show error message to user if we have local data
+                    if cachedFlights.isEmpty {
+                        self.errorMessage = "Unable to load flights"
+                    }
+                }
             }
         }
     }
@@ -104,7 +119,7 @@ final class FlightsListViewModel: ObservableObject {
                     }
                 }
                 
-                // Create new Flight instance with updated values
+                // Create new Flight instance with updated values, preserving claim data
                 updatedFlight = Flight(
                     id: updatedFlight.id,
                     flightNumber: updatedFlight.flightNumber,
@@ -115,7 +130,9 @@ final class FlightsListViewModel: ObservableObject {
                     scheduledArrival: updatedFlight.scheduledArrival,
                     status: updatedFlight.status,
                     currentStatus: status,
-                    delayEvents: delayEvents
+                    delayEvents: delayEvents,
+                    claimStatus: updatedFlight.claimStatus,
+                    claimReference: updatedFlight.claimReference
                 )
                 
                 // Update flight in the list with all new data

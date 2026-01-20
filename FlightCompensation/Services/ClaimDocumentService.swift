@@ -1,4 +1,5 @@
 import Foundation
+import FirebaseStorage
 
 enum ClaimDocumentType {
     case masterAuthorization
@@ -76,10 +77,92 @@ struct ClaimDocumentService {
     #endif
     
     func getPDFURL(for claimReference: String, type: ClaimDocumentType) -> URL? {
-        guard let dir = getDirectory(for: type) else { return nil }
+        guard let dir = getDirectory(for: type) else { 
+            print("❌ [Documents] Could not get directory for \(type)")
+            return nil 
+        }
         let filename = type.filename(for: claimReference)
         let url = dir.appendingPathComponent(filename)
         
-        return fileManager.fileExists(atPath: url.path) ? url : nil
+        let exists = fileManager.fileExists(atPath: url.path)
+        print("📄 [Documents] Looking for: \(url.path)")
+        print("📄 [Documents] File exists: \(exists)")
+        
+        if exists {
+            // Check file size
+            if let attrs = try? fileManager.attributesOfItem(atPath: url.path),
+               let size = attrs[.size] as? Int {
+                print("📄 [Documents] File size: \(size) bytes")
+            }
+        }
+        
+        return exists ? url : nil
+    }
+    
+    #if targetEnvironment(simulator)
+    /// Save email metadata for the local email bot to pick up
+    func saveEmailMetadata(
+        claimReference: String,
+        toEmail: String,
+        ccEmail: String?,
+        subject: String,
+        body: String,
+        pdfFilenames: [String]
+    ) {
+        let macDocsPath = "/Users/fabiano/Documents/FlightyClaims/OutgoingEmails"
+        let macDocsURL = URL(fileURLWithPath: macDocsPath)
+        
+        do {
+            if !FileManager.default.fileExists(atPath: macDocsPath) {
+                try FileManager.default.createDirectory(at: macDocsURL, withIntermediateDirectories: true)
+            }
+            
+            let metadata: [String: Any] = [
+                "claimReference": claimReference,
+                "to": toEmail,
+                "cc": ccEmail ?? "",
+                "subject": subject,
+                "body": body,
+                "attachments": pdfFilenames,
+                "status": "pending",
+                "createdAt": ISO8601DateFormatter().string(from: Date())
+            ]
+            
+            let safeRef = claimReference.replacingOccurrences(of: "/", with: "-")
+            let jsonFilename = "email_\(safeRef).json"
+            let jsonURL = macDocsURL.appendingPathComponent(jsonFilename)
+            
+            let jsonData = try JSONSerialization.data(withJSONObject: metadata, options: [.prettyPrinted, .sortedKeys])
+            try jsonData.write(to: jsonURL)
+            
+            print("📧 Saved email metadata: \(jsonURL.path)")
+        } catch {
+            print("⚠️ Failed to save email metadata: \(error)")
+        }
+    }
+    #endif
+    
+    /// Uploads a PDF to Firebase Storage and returns the download URL
+    func uploadPDF(data: Data, claimReference: String, type: ClaimDocumentType) async -> String? {
+        let storage = Storage.storage()
+        let filename = type.filename(for: claimReference)
+        let path = "claims/\(claimReference)/\(filename)"
+        let storageRef = storage.reference().child(path)
+        
+        let metadata = StorageMetadata()
+        metadata.contentType = "application/pdf"
+        
+        do {
+            // Upload data
+            _ = try await storageRef.putDataAsync(data, metadata: metadata)
+            
+            // Get download URL
+            let downloadURL = try await storageRef.downloadURL()
+            print("✅ Uploaded PDF to Cloud: \(path)")
+            return downloadURL.absoluteString
+        } catch {
+            print("❌ Failed to upload PDF to Firebase Storage: \(error.localizedDescription)")
+            return nil
+        }
     }
 }

@@ -7,13 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		003B86743564782234CD221E /* SettingsProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E917B30F812E2D79592FB634 /* SettingsProfileView.swift */; };
 		005A5A8981E97E6EF547899D /* EU261EligibilityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 120B283D3136BD63B859732D /* EU261EligibilityService.swift */; };
 		0412968A03F1203B68EFB43B /* ClaimViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17F684CFB28DDE5D64D2836C /* ClaimViewModel.swift */; };
 		090904C002B3226574FF2708 /* BiometricService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7362D921259F98E96FAD9A86 /* BiometricService.swift */; };
 		0F06A7158C7A4FA5FD250FCB /* FlightCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B5367A4D9D3C8633F9B2A26 /* FlightCardView.swift */; };
 		14BA72D1EDDE450AAA6A120A /* FlightCompensationApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74FBC61B4AED9DBBE0E16ADB /* FlightCompensationApp.swift */; };
 		2080AA3D74EF65C3A15A578F /* FlightDelayAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A26BC18D4F718A712E38223D /* FlightDelayAnimationView.swift */; };
+		20C05F8A4DBD8782D63AE33B /* FlightsGlobeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED63B3CDC9D1FA26A3BE11C8 /* FlightsGlobeView.swift */; };
+		221B7BCA7B63C6F4E0C154EB /* EmailService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83BFBD4301F3C34D05C5E04A /* EmailService.swift */; };
 		27A756D00F91ECD409C4B86B /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = D164057FF4325B47FFB24EC1 /* Config.swift */; };
+		28D7171CDC9E0C49A5E6000D /* MailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DD49FAF77AE7BD299F75452 /* MailView.swift */; };
 		2E2871AA8E10F570F9922719 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DDB34EC44CEBB799CCED9B1 /* NotificationManager.swift */; };
 		3019A99FB2C47FBD4050FA21 /* ClaimModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BDA8730470DFFD036AFB48 /* ClaimModels.swift */; };
 		3096739BC9C7607640E70B22 /* AppDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF35C1CDC63B098CA12FEBB1 /* AppDependencies.swift */; };
@@ -23,6 +27,7 @@
 		3A14B8FB1445929718147EC6 /* SampleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35AEA857E83E7BEC5E03508F /* SampleData.swift */; };
 		40614665335ACCA372E516FB /* WalletImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E87468725022EEE30686E2A2 /* WalletImportService.swift */; };
 		445F72C60FF292E3BF87343B /* NotificationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EA5F50AADF57468B61866F0 /* NotificationDelegate.swift */; };
+		47CB6C6E4CCCEC1B4909D713 /* WalletPassView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC80951D5CB55E1D4140A0B /* WalletPassView.swift */; };
 		4B786E901E0C909FF6FBDF47 /* FlightStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FF6EA31E74BA00C31633DB7 /* FlightStatus.swift */; };
 		53E7B38746CCE981E2F69CD3 /* Date+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9E494F309B9AE2BD90251A7 /* Date+Extensions.swift */; };
 		575E365EAE623765E283B6A0 /* LiveTextScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8629BBB183C89BE4F2C4FF79 /* LiveTextScanner.swift */; };
@@ -35,26 +40,39 @@
 		678D342A738387C20B2DB178 /* FlightMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBA0F377AF883A27A1986F6F /* FlightMapView.swift */; };
 		67E730BD156FAF7DA75D82C5 /* BackgroundTrackingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C63580537CC6F4293A1F0A /* BackgroundTrackingManager.swift */; };
 		703B83D3C0CEEF3FCB805157 /* CustomDesignComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE40B2B4C643B9A379BF3F55 /* CustomDesignComponents.swift */; };
+		70A0D78B7499E6B4CF55F4E1 /* PayoutIntegrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 963A597C4AE7DFA490D1FBDF /* PayoutIntegrationView.swift */; };
 		734C01DF9BD28105F4495600 /* CompensationEligibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DEF14557735DF4CCDA16995 /* CompensationEligibility.swift */; };
 		77CA2AD2283CC0E14BFE1A9C /* SubmissionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8538B3892E4E1A23E1C872ED /* SubmissionService.swift */; };
 		7863FAD4BAA4592CCCA0696C /* MockWalletImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE8FDAEFE876FCB7DB1A257 /* MockWalletImportService.swift */; };
 		7990F5ADE68088161E2C2F00 /* DocumentUploadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D99DAD4D638AEAFF16B34015 /* DocumentUploadView.swift */; };
 		7A068ECCAD2BA7D1580642F9 /* FlightsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E56C04532B39F5A5A6AED62 /* FlightsListView.swift */; };
+		7A30F53CF766A6F461C5EC84 /* PayoutDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43F214EAD172B8FFDC451189 /* PayoutDetailsView.swift */; };
+		85ADEFA2C621F5B71BFE8638 /* PayoutService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91602F80F0119DC8AAC43A4D /* PayoutService.swift */; };
 		86D7F0FC353B46ED22201A3B /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF93009479756E691366BE73 /* Constants.swift */; };
+		894FBD7945BF744E1DE7FBAB /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 0766CCFB58EB9093D45C0FE6 /* FirebaseStorage */; };
 		8DEF58DCD405CEE099A5CA64 /* FlightDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96BF1888E8CE1B742DA7E703 /* FlightDetailViewModel.swift */; };
 		8F636A3E45A7AA712DFC108F /* HeadingSmoother.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89268822E1C98308553AE966 /* HeadingSmoother.swift */; };
 		906D948D14AF2A1670D94AF7 /* MockFlightTrackingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93CA37643F1FE56FC16CAD31 /* MockFlightTrackingService.swift */; };
 		90D11B73B70E271B9DAEA4B5 /* CompensationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736D64F9CD8DD27F4D554D89 /* CompensationView.swift */; };
 		94C44961A74A21D4E57C6046 /* Airline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143B29304895EC0152A1F586 /* Airline.swift */; };
 		96F4ADFB2CCE38FE1BC7B688 /* SignatureCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3063C1CA60E99214D25251C8 /* SignatureCanvas.swift */; };
+		9B36C1CAB2BAF2F34D93346A /* IBANValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2839876A2950D0A1CA830F08 /* IBANValidator.swift */; };
+		A1C0D9E025F888201A02B427 /* PayoutDetailsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B43ECF1E8A0FC0BCB4DF9250 /* PayoutDetailsViewModel.swift */; };
+		A744FCE977608A70E011B642 /* PayoutStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E687402E9787634C07B0728 /* PayoutStatusView.swift */; };
 		A86C0D50539DAEA28B7EC4B2 /* PassengerFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1DBAAB6804EBB5A801BC065 /* PassengerFormView.swift */; };
 		A9B9F44EBD6BBC9853821EC7 /* FlightStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE83DE8A03B198B7D2182E8B /* FlightStorageService.swift */; };
 		B38B4635F3783BCA830BC475 /* WalletImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F1E13CE7B68CA5939CE63AA /* WalletImportView.swift */; };
 		B642573E6150D097780BCFC5 /* CompensationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECB22E574CD1AB801E574D0E /* CompensationViewModel.swift */; };
 		B7992D411021731F9FBB14CD /* ShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09535ED8233DC70E3EC4B2CB /* ShareSheet.swift */; };
+		BC1850E1C56BFCEFE42A5F93 /* PayoutModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12B7ABB5A21EC30B1894081E /* PayoutModels.swift */; };
 		BC6CA9A0C4CCC1C1A96B47D8 /* FlightRadar24Service.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA9DD65C837F08422BB5F42A /* FlightRadar24Service.swift */; };
+		BEE776BA711553A9035E6B88 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1DF90E5C47C7C2D4AF610804 /* GoogleService-Info.plist */; };
+		BF01AA48ED2A8409E43B81C2 /* Airline+Contact.swift in Sources */ = {isa = PBXBuildFile; fileRef = D802021DA2DF9A8B15322AE3 /* Airline+Contact.swift */; };
+		C1165863486515C0EED33567 /* AuthenticationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BE2085C52BAD6874232C38 /* AuthenticationService.swift */; };
 		C61960F2ACE3373612C1852F /* ClaimFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2662E1F7113323FA1DAECB9 /* ClaimFlowView.swift */; };
+		C78ED8433B728991FC4A432B /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 525BC4EE095840E0A981F912 /* FirebaseAuth */; };
 		CA34234B240A0E66186DC5F5 /* PDFService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AEFD579977E5837534CBEE7 /* PDFService.swift */; };
+		CE5266A149D2CE2B0413D82C /* ClassicBoardingPass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103AA8B5F1B5ECFB3246AEEF /* ClassicBoardingPass.swift */; };
 		D05AC2A02FE0C53FD90B73FD /* Flight.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD7F48DD519272D4BC37B52D /* Flight.swift */; };
 		D09E3300723B25ECD4A262DE /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B56C79C6AACEE1821E9E6A0 /* OnboardingView.swift */; };
 		D6A22967AE8CBB37F39AD798 /* Airport.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE7E98E67D67AD7B82FB2EF1 /* Airport.swift */; };
@@ -62,22 +80,31 @@
 		E8F76C0A945CAE0EEF0E116E /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = A83F75DF7181E3231F7FB9A1 /* UserProfile.swift */; };
 		ED9F445C913B2D55A441C90B /* ManualEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09A13F48259E862483B4451 /* ManualEntryView.swift */; };
 		F0B96BF0C013CE9DF4328262 /* FlightsListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292D2E7CBA2A75832E962DE1 /* FlightsListViewModel.swift */; };
+		F0F7E914C79863124E2165FF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE6545B3317993FA4EAD4857 /* Assets.xcassets */; };
+		F33CB7EDABBDBE4784223B5C /* ClaimSubmissionGuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C521C7E8128E70DA0167838 /* ClaimSubmissionGuideView.swift */; };
+		F51D567E01C33CAB686E7747 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = BFB1119B79AA21DE15A85CCB /* FirebaseFirestore */; };
 		F8B29D1253E02E545FE86F0E /* FlightTrackingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EE2D7E2BF8C3A1E4FE0C33E /* FlightTrackingService.swift */; };
 		F94DDFB4DB4C12E0ED66D25B /* DelayEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82BAEACE640D70C36E0FA826 /* DelayEvent.swift */; };
+		FB490B63145EE1CF2D410D04 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 9E1090AF571AA3FD7512C705 /* FirebaseAnalytics */; };
 		FB799089618CD6B3A36C625B /* AddFlightView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042999E223326F06FC59DACF /* AddFlightView.swift */; };
 		FE1214BFCD8BA9C5439901EF /* TicketScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17E74BE5D100643FE5E0F821 /* TicketScanView.swift */; };
+		FEC40EA0DEA71E704B9DD004 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 49D0BBCC27D42A41E9B741F2 /* GoogleSignIn */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		042999E223326F06FC59DACF /* AddFlightView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFlightView.swift; sourceTree = "<group>"; };
 		09535ED8233DC70E3EC4B2CB /* ShareSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSheet.swift; sourceTree = "<group>"; };
+		103AA8B5F1B5ECFB3246AEEF /* ClassicBoardingPass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassicBoardingPass.swift; sourceTree = "<group>"; };
 		120B283D3136BD63B859732D /* EU261EligibilityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EU261EligibilityService.swift; sourceTree = "<group>"; };
+		12B7ABB5A21EC30B1894081E /* PayoutModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayoutModels.swift; sourceTree = "<group>"; };
 		143B29304895EC0152A1F586 /* Airline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Airline.swift; sourceTree = "<group>"; };
 		14694ED9174CE69A61A9F41E /* RepresentationSignatureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepresentationSignatureView.swift; sourceTree = "<group>"; };
 		17E74BE5D100643FE5E0F821 /* TicketScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketScanView.swift; sourceTree = "<group>"; };
 		17F684CFB28DDE5D64D2836C /* ClaimViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimViewModel.swift; sourceTree = "<group>"; };
 		1A563C2AF45F8C9A15B0FAB5 /* WelcomeCarouselView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeCarouselView.swift; sourceTree = "<group>"; };
 		1B5367A4D9D3C8633F9B2A26 /* FlightCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightCardView.swift; sourceTree = "<group>"; };
+		1DF90E5C47C7C2D4AF610804 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		2839876A2950D0A1CA830F08 /* IBANValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IBANValidator.swift; sourceTree = "<group>"; };
 		292D2E7CBA2A75832E962DE1 /* FlightsListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightsListViewModel.swift; sourceTree = "<group>"; };
 		2DDB34EC44CEBB799CCED9B1 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		2DEF14557735DF4CCDA16995 /* CompensationEligibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompensationEligibility.swift; sourceTree = "<group>"; };
@@ -87,49 +114,78 @@
 		3EA5F50AADF57468B61866F0 /* NotificationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationDelegate.swift; sourceTree = "<group>"; };
 		3EE2D7E2BF8C3A1E4FE0C33E /* FlightTrackingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightTrackingService.swift; sourceTree = "<group>"; };
 		3FC2C76AA3921278CAA0164F /* UserProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileService.swift; sourceTree = "<group>"; };
+		43F214EAD172B8FFDC451189 /* PayoutDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayoutDetailsView.swift; sourceTree = "<group>"; };
 		53BDA8730470DFFD036AFB48 /* ClaimModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimModels.swift; sourceTree = "<group>"; };
 		671526ECF792E0B84649AB83 /* FlightTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightTimelineView.swift; sourceTree = "<group>"; };
 		6AEFD579977E5837534CBEE7 /* PDFService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFService.swift; sourceTree = "<group>"; };
+		6E687402E9787634C07B0728 /* PayoutStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayoutStatusView.swift; sourceTree = "<group>"; };
 		7362D921259F98E96FAD9A86 /* BiometricService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricService.swift; sourceTree = "<group>"; };
 		736D64F9CD8DD27F4D554D89 /* CompensationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompensationView.swift; sourceTree = "<group>"; };
 		74FBC61B4AED9DBBE0E16ADB /* FlightCompensationApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightCompensationApp.swift; sourceTree = "<group>"; };
 		7F1E13CE7B68CA5939CE63AA /* WalletImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletImportView.swift; sourceTree = "<group>"; };
 		81DA6483BE20353360B355EB /* FlightCompensation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlightCompensation.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		82BAEACE640D70C36E0FA826 /* DelayEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelayEvent.swift; sourceTree = "<group>"; };
+		83BFBD4301F3C34D05C5E04A /* EmailService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailService.swift; sourceTree = "<group>"; };
 		83C63580537CC6F4293A1F0A /* BackgroundTrackingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundTrackingManager.swift; sourceTree = "<group>"; };
+		84BE2085C52BAD6874232C38 /* AuthenticationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationService.swift; sourceTree = "<group>"; };
 		8538B3892E4E1A23E1C872ED /* SubmissionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubmissionService.swift; sourceTree = "<group>"; };
 		8629BBB183C89BE4F2C4FF79 /* LiveTextScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveTextScanner.swift; sourceTree = "<group>"; };
 		89268822E1C98308553AE966 /* HeadingSmoother.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadingSmoother.swift; sourceTree = "<group>"; };
 		8B56C79C6AACEE1821E9E6A0 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		8C521C7E8128E70DA0167838 /* ClaimSubmissionGuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimSubmissionGuideView.swift; sourceTree = "<group>"; };
 		8FF6EA31E74BA00C31633DB7 /* FlightStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightStatus.swift; sourceTree = "<group>"; };
+		91602F80F0119DC8AAC43A4D /* PayoutService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayoutService.swift; sourceTree = "<group>"; };
 		93CA37643F1FE56FC16CAD31 /* MockFlightTrackingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockFlightTrackingService.swift; sourceTree = "<group>"; };
+		963A597C4AE7DFA490D1FBDF /* PayoutIntegrationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayoutIntegrationView.swift; sourceTree = "<group>"; };
 		96BF1888E8CE1B742DA7E703 /* FlightDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightDetailViewModel.swift; sourceTree = "<group>"; };
+		9DD49FAF77AE7BD299F75452 /* MailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailView.swift; sourceTree = "<group>"; };
 		A09A13F48259E862483B4451 /* ManualEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualEntryView.swift; sourceTree = "<group>"; };
 		A26BC18D4F718A712E38223D /* FlightDelayAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightDelayAnimationView.swift; sourceTree = "<group>"; };
 		A83F75DF7181E3231F7FB9A1 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
+		AAC80951D5CB55E1D4140A0B /* WalletPassView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletPassView.swift; sourceTree = "<group>"; };
 		ADBC67AAAD5C3A33EC6C205D /* ProfileSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSetupView.swift; sourceTree = "<group>"; };
 		AE83DE8A03B198B7D2182E8B /* FlightStorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightStorageService.swift; sourceTree = "<group>"; };
+		B43ECF1E8A0FC0BCB4DF9250 /* PayoutDetailsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayoutDetailsViewModel.swift; sourceTree = "<group>"; };
 		B9E494F309B9AE2BD90251A7 /* Date+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extensions.swift"; sourceTree = "<group>"; };
 		BBA0F377AF883A27A1986F6F /* FlightMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightMapView.swift; sourceTree = "<group>"; };
 		C2662E1F7113323FA1DAECB9 /* ClaimFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimFlowView.swift; sourceTree = "<group>"; };
 		CD7F48DD519272D4BC37B52D /* Flight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Flight.swift; sourceTree = "<group>"; };
+		CE6545B3317993FA4EAD4857 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CF93009479756E691366BE73 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		D164057FF4325B47FFB24EC1 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 		D1DBAAB6804EBB5A801BC065 /* PassengerFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassengerFormView.swift; sourceTree = "<group>"; };
 		D3E1F1B992C4072B2059B8E4 /* AddFlightViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFlightViewModel.swift; sourceTree = "<group>"; };
+		D802021DA2DF9A8B15322AE3 /* Airline+Contact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Airline+Contact.swift"; sourceTree = "<group>"; };
 		D99DAD4D638AEAFF16B34015 /* DocumentUploadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentUploadView.swift; sourceTree = "<group>"; };
 		DDE8FDAEFE876FCB7DB1A257 /* MockWalletImportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockWalletImportService.swift; sourceTree = "<group>"; };
 		DF35C1CDC63B098CA12FEBB1 /* AppDependencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDependencies.swift; sourceTree = "<group>"; };
 		E0E41189924643EDEDE58C70 /* HapticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticsManager.swift; sourceTree = "<group>"; };
 		E87468725022EEE30686E2A2 /* WalletImportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletImportService.swift; sourceTree = "<group>"; };
+		E917B30F812E2D79592FB634 /* SettingsProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsProfileView.swift; sourceTree = "<group>"; };
 		EA9DD65C837F08422BB5F42A /* FlightRadar24Service.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightRadar24Service.swift; sourceTree = "<group>"; };
 		ECB22E574CD1AB801E574D0E /* CompensationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompensationViewModel.swift; sourceTree = "<group>"; };
+		ED63B3CDC9D1FA26A3BE11C8 /* FlightsGlobeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightsGlobeView.swift; sourceTree = "<group>"; };
 		F218B551375D811378C75B70 /* ClaimDocumentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimDocumentService.swift; sourceTree = "<group>"; };
 		F48F919EEC3FEFDDFCD6FE14 /* EligibilityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EligibilityService.swift; sourceTree = "<group>"; };
 		FC1BF6C2281902F8A1C52E25 /* FlightDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightDetailView.swift; sourceTree = "<group>"; };
 		FE40B2B4C643B9A379BF3F55 /* CustomDesignComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomDesignComponents.swift; sourceTree = "<group>"; };
 		FE7E98E67D67AD7B82FB2EF1 /* Airport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Airport.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		37DFBE254C23128E56EE951C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FB490B63145EE1CF2D410D04 /* FirebaseAnalytics in Frameworks */,
+				C78ED8433B728991FC4A432B /* FirebaseAuth in Frameworks */,
+				F51D567E01C33CAB686E7747 /* FirebaseFirestore in Frameworks */,
+				894FBD7945BF744E1DE7FBAB /* FirebaseStorage in Frameworks */,
+				FEC40EA0DEA71E704B9DD004 /* GoogleSignIn in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		0B4430FCDC45985FF314C5FF /* Utilities */ = {
@@ -140,6 +196,8 @@
 				CF93009479756E691366BE73 /* Constants.swift */,
 				E0E41189924643EDEDE58C70 /* HapticsManager.swift */,
 				89268822E1C98308553AE966 /* HeadingSmoother.swift */,
+				2839876A2950D0A1CA830F08 /* IBANValidator.swift */,
+				9DD49FAF77AE7BD299F75452 /* MailView.swift */,
 				3EA5F50AADF57468B61866F0 /* NotificationDelegate.swift */,
 				2DDB34EC44CEBB799CCED9B1 /* NotificationManager.swift */,
 				35AEA857E83E7BEC5E03508F /* SampleData.swift */,
@@ -165,6 +223,7 @@
 				ECB22E574CD1AB801E574D0E /* CompensationViewModel.swift */,
 				96BF1888E8CE1B742DA7E703 /* FlightDetailViewModel.swift */,
 				292D2E7CBA2A75832E962DE1 /* FlightsListViewModel.swift */,
+				B43ECF1E8A0FC0BCB4DF9250 /* PayoutDetailsViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -183,15 +242,18 @@
 		62BC3FD0E296433EA4737B18 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				84BE2085C52BAD6874232C38 /* AuthenticationService.swift */,
 				7362D921259F98E96FAD9A86 /* BiometricService.swift */,
 				F218B551375D811378C75B70 /* ClaimDocumentService.swift */,
 				F48F919EEC3FEFDDFCD6FE14 /* EligibilityService.swift */,
+				83BFBD4301F3C34D05C5E04A /* EmailService.swift */,
 				120B283D3136BD63B859732D /* EU261EligibilityService.swift */,
 				EA9DD65C837F08422BB5F42A /* FlightRadar24Service.swift */,
 				AE83DE8A03B198B7D2182E8B /* FlightStorageService.swift */,
 				3EE2D7E2BF8C3A1E4FE0C33E /* FlightTrackingService.swift */,
 				93CA37643F1FE56FC16CAD31 /* MockFlightTrackingService.swift */,
 				DDE8FDAEFE876FCB7DB1A257 /* MockWalletImportService.swift */,
+				91602F80F0119DC8AAC43A4D /* PayoutService.swift */,
 				6AEFD579977E5837534CBEE7 /* PDFService.swift */,
 				8538B3892E4E1A23E1C872ED /* SubmissionService.swift */,
 				3FC2C76AA3921278CAA0164F /* UserProfileService.swift */,
@@ -208,12 +270,21 @@
 			);
 			sourceTree = "<group>";
 		};
+		83E565DFA3B43C9F98629276 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				E917B30F812E2D79592FB634 /* SettingsProfileView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
 		92207FF7EC4CCD382FC2CC80 /* Components */ = {
 			isa = PBXGroup;
 			children = (
 				FE40B2B4C643B9A379BF3F55 /* CustomDesignComponents.swift */,
 				8629BBB183C89BE4F2C4FF79 /* LiveTextScanner.swift */,
 				3063C1CA60E99214D25251C8 /* SignatureCanvas.swift */,
+				AAC80951D5CB55E1D4140A0B /* WalletPassView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -226,6 +297,7 @@
 				92207FF7EC4CCD382FC2CC80 /* Components */,
 				C43CF714A29636078F5A230F /* Flights */,
 				562450DA03031B09784C7062 /* Onboarding */,
+				83E565DFA3B43C9F98629276 /* Settings */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -233,6 +305,8 @@
 		BE416C4A8E7F4F27A76EB068 /* FlightCompensation */ = {
 			isa = PBXGroup;
 			children = (
+				CE6545B3317993FA4EAD4857 /* Assets.xcassets */,
+				1DF90E5C47C7C2D4AF610804 /* GoogleService-Info.plist */,
 				F10472A842FDE8BD22B67E4F /* App */,
 				ED239BA82C1B215DB675037E /* Models */,
 				62BC3FD0E296433EA4737B18 /* Services */,
@@ -246,9 +320,11 @@
 		C43CF714A29636078F5A230F /* Flights */ = {
 			isa = PBXGroup;
 			children = (
+				103AA8B5F1B5ECFB3246AEEF /* ClassicBoardingPass.swift */,
 				1B5367A4D9D3C8633F9B2A26 /* FlightCardView.swift */,
 				FC1BF6C2281902F8A1C52E25 /* FlightDetailView.swift */,
 				BBA0F377AF883A27A1986F6F /* FlightMapView.swift */,
+				ED63B3CDC9D1FA26A3BE11C8 /* FlightsGlobeView.swift */,
 				2E56C04532B39F5A5A6AED62 /* FlightsListView.swift */,
 				671526ECF792E0B84649AB83 /* FlightTimelineView.swift */,
 			);
@@ -278,12 +354,14 @@
 			isa = PBXGroup;
 			children = (
 				143B29304895EC0152A1F586 /* Airline.swift */,
+				D802021DA2DF9A8B15322AE3 /* Airline+Contact.swift */,
 				FE7E98E67D67AD7B82FB2EF1 /* Airport.swift */,
 				53BDA8730470DFFD036AFB48 /* ClaimModels.swift */,
 				2DEF14557735DF4CCDA16995 /* CompensationEligibility.swift */,
 				82BAEACE640D70C36E0FA826 /* DelayEvent.swift */,
 				CD7F48DD519272D4BC37B52D /* Flight.swift */,
 				8FF6EA31E74BA00C31633DB7 /* FlightStatus.swift */,
+				12B7ABB5A21EC30B1894081E /* PayoutModels.swift */,
 				A83F75DF7181E3231F7FB9A1 /* UserProfile.swift */,
 			);
 			path = Models;
@@ -302,9 +380,13 @@
 			isa = PBXGroup;
 			children = (
 				C2662E1F7113323FA1DAECB9 /* ClaimFlowView.swift */,
+				8C521C7E8128E70DA0167838 /* ClaimSubmissionGuideView.swift */,
 				736D64F9CD8DD27F4D554D89 /* CompensationView.swift */,
 				D99DAD4D638AEAFF16B34015 /* DocumentUploadView.swift */,
 				D1DBAAB6804EBB5A801BC065 /* PassengerFormView.swift */,
+				43F214EAD172B8FFDC451189 /* PayoutDetailsView.swift */,
+				963A597C4AE7DFA490D1FBDF /* PayoutIntegrationView.swift */,
+				6E687402E9787634C07B0728 /* PayoutStatusView.swift */,
 				14694ED9174CE69A61A9F41E /* RepresentationSignatureView.swift */,
 			);
 			path = Compensation;
@@ -318,6 +400,8 @@
 			buildConfigurationList = 5083006A08EC1CAD558A985A /* Build configuration list for PBXNativeTarget "FlightCompensation" */;
 			buildPhases = (
 				9360A46DC62FF8A58A5D83A0 /* Sources */,
+				CF5CAFFB1ABFBDEDECF2DB91 /* Resources */,
+				37DFBE254C23128E56EE951C /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -325,6 +409,11 @@
 			);
 			name = FlightCompensation;
 			packageProductDependencies = (
+				9E1090AF571AA3FD7512C705 /* FirebaseAnalytics */,
+				525BC4EE095840E0A981F912 /* FirebaseAuth */,
+				BFB1119B79AA21DE15A85CCB /* FirebaseFirestore */,
+				0766CCFB58EB9093D45C0FE6 /* FirebaseStorage */,
+				49D0BBCC27D42A41E9B741F2 /* GoogleSignIn */,
 			);
 			productName = FlightCompensation;
 			productReference = 81DA6483BE20353360B355EB /* FlightCompensation.app */;
@@ -338,6 +427,11 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					1AE224EDC3EA3D1B3B7C1EE3 = {
+						ProvisioningStyle = Automatic;
+					};
+				};
 			};
 			buildConfigurationList = 7E215EADDBCCBB65FF5C6F8C /* Build configuration list for PBXProject "FlightCompensation" */;
 			compatibilityVersion = "Xcode 14.0";
@@ -349,6 +443,10 @@
 			);
 			mainGroup = 700A20254425DA34A624BB25;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				28030E06D92C2F5C4FB52292 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				1EDDB3D275B4CEF469B1C954 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+			);
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -357,6 +455,18 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		CF5CAFFB1ABFBDEDECF2DB91 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F0F7E914C79863124E2165FF /* Assets.xcassets in Resources */,
+				BEE776BA711553A9035E6B88 /* GoogleService-Info.plist in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		9360A46DC62FF8A58A5D83A0 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -364,15 +474,19 @@
 			files = (
 				FB799089618CD6B3A36C625B /* AddFlightView.swift in Sources */,
 				5B5EC5495184DA4C9579DC17 /* AddFlightViewModel.swift in Sources */,
+				BF01AA48ED2A8409E43B81C2 /* Airline+Contact.swift in Sources */,
 				94C44961A74A21D4E57C6046 /* Airline.swift in Sources */,
 				D6A22967AE8CBB37F39AD798 /* Airport.swift in Sources */,
 				3096739BC9C7607640E70B22 /* AppDependencies.swift in Sources */,
+				C1165863486515C0EED33567 /* AuthenticationService.swift in Sources */,
 				67E730BD156FAF7DA75D82C5 /* BackgroundTrackingManager.swift in Sources */,
 				090904C002B3226574FF2708 /* BiometricService.swift in Sources */,
 				58170A2737BFC624758BA213 /* ClaimDocumentService.swift in Sources */,
 				C61960F2ACE3373612C1852F /* ClaimFlowView.swift in Sources */,
 				3019A99FB2C47FBD4050FA21 /* ClaimModels.swift in Sources */,
+				F33CB7EDABBDBE4784223B5C /* ClaimSubmissionGuideView.swift in Sources */,
 				0412968A03F1203B68EFB43B /* ClaimViewModel.swift in Sources */,
+				CE5266A149D2CE2B0413D82C /* ClassicBoardingPass.swift in Sources */,
 				734C01DF9BD28105F4495600 /* CompensationEligibility.swift in Sources */,
 				90D11B73B70E271B9DAEA4B5 /* CompensationView.swift in Sources */,
 				B642573E6150D097780BCFC5 /* CompensationViewModel.swift in Sources */,
@@ -384,6 +498,7 @@
 				7990F5ADE68088161E2C2F00 /* DocumentUploadView.swift in Sources */,
 				005A5A8981E97E6EF547899D /* EU261EligibilityService.swift in Sources */,
 				5EEFF3BAF096D83636D98968 /* EligibilityService.swift in Sources */,
+				221B7BCA7B63C6F4E0C154EB /* EmailService.swift in Sources */,
 				D05AC2A02FE0C53FD90B73FD /* Flight.swift in Sources */,
 				0F06A7158C7A4FA5FD250FCB /* FlightCardView.swift in Sources */,
 				14BA72D1EDDE450AAA6A120A /* FlightCompensationApp.swift in Sources */,
@@ -396,11 +511,14 @@
 				A9B9F44EBD6BBC9853821EC7 /* FlightStorageService.swift in Sources */,
 				36C91ACC897873388C082322 /* FlightTimelineView.swift in Sources */,
 				F8B29D1253E02E545FE86F0E /* FlightTrackingService.swift in Sources */,
+				20C05F8A4DBD8782D63AE33B /* FlightsGlobeView.swift in Sources */,
 				7A068ECCAD2BA7D1580642F9 /* FlightsListView.swift in Sources */,
 				F0B96BF0C013CE9DF4328262 /* FlightsListViewModel.swift in Sources */,
 				645C3402E38C6045ED8C8B3B /* HapticsManager.swift in Sources */,
 				8F636A3E45A7AA712DFC108F /* HeadingSmoother.swift in Sources */,
+				9B36C1CAB2BAF2F34D93346A /* IBANValidator.swift in Sources */,
 				575E365EAE623765E283B6A0 /* LiveTextScanner.swift in Sources */,
+				28D7171CDC9E0C49A5E6000D /* MailView.swift in Sources */,
 				ED9F445C913B2D55A441C90B /* ManualEntryView.swift in Sources */,
 				906D948D14AF2A1670D94AF7 /* MockFlightTrackingService.swift in Sources */,
 				7863FAD4BAA4592CCCA0696C /* MockWalletImportService.swift in Sources */,
@@ -409,9 +527,16 @@
 				D09E3300723B25ECD4A262DE /* OnboardingView.swift in Sources */,
 				CA34234B240A0E66186DC5F5 /* PDFService.swift in Sources */,
 				A86C0D50539DAEA28B7EC4B2 /* PassengerFormView.swift in Sources */,
+				7A30F53CF766A6F461C5EC84 /* PayoutDetailsView.swift in Sources */,
+				A1C0D9E025F888201A02B427 /* PayoutDetailsViewModel.swift in Sources */,
+				70A0D78B7499E6B4CF55F4E1 /* PayoutIntegrationView.swift in Sources */,
+				BC1850E1C56BFCEFE42A5F93 /* PayoutModels.swift in Sources */,
+				85ADEFA2C621F5B71BFE8638 /* PayoutService.swift in Sources */,
+				A744FCE977608A70E011B642 /* PayoutStatusView.swift in Sources */,
 				38E3FABBB40159F1B38E2D76 /* ProfileSetupView.swift in Sources */,
 				359FDBFF8C459D76291C1FED /* RepresentationSignatureView.swift in Sources */,
 				3A14B8FB1445929718147EC6 /* SampleData.swift in Sources */,
+				003B86743564782234CD221E /* SettingsProfileView.swift in Sources */,
 				B7992D411021731F9FBB14CD /* ShareSheet.swift in Sources */,
 				96F4ADFB2CCE38FE1BC7B688 /* SignatureCanvas.swift in Sources */,
 				77CA2AD2283CC0E14BFE1A9C /* SubmissionService.swift in Sources */,
@@ -420,6 +545,7 @@
 				D78BBEE464B3C2F87CB72F34 /* UserProfileService.swift in Sources */,
 				40614665335ACCA372E516FB /* WalletImportService.swift in Sources */,
 				B38B4635F3783BCA830BC475 /* WalletImportView.swift in Sources */,
+				47CB6C6E4CCCEC1B4909D713 /* WalletPassView.swift in Sources */,
 				5F7B55120C548263FB90AA2E /* WelcomeCarouselView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -431,7 +557,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_ENTITLEMENTS = FlightCompensation.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = NS3BA8PQYC;
 				INFOPLIST_FILE = Info.plist;
@@ -446,7 +573,6 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.flightcompensation.app;
-				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -459,7 +585,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_ENTITLEMENTS = FlightCompensation.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = NS3BA8PQYC;
 				INFOPLIST_FILE = Info.plist;
@@ -474,7 +601,6 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.flightcompensation.app;
-				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -624,6 +750,53 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		1EDDB3D275B4CEF469B1C954 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.0.0;
+			};
+		};
+		28030E06D92C2F5C4FB52292 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		0766CCFB58EB9093D45C0FE6 /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 28030E06D92C2F5C4FB52292 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
+		49D0BBCC27D42A41E9B741F2 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1EDDB3D275B4CEF469B1C954 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		525BC4EE095840E0A981F912 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 28030E06D92C2F5C4FB52292 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		9E1090AF571AA3FD7512C705 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 28030E06D92C2F5C4FB52292 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		BFB1119B79AA21DE15A85CCB /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 28030E06D92C2F5C4FB52292 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 9F443597054BC722BC0E04DD /* Project object */;
 }
