@@ -110,24 +110,18 @@ struct ClaimFlowView: View {
                     }
                 }
             }
-            .alert("Success", isPresented: $viewModel.isSuccess) {
-                Button("Done") {
-                    HapticsManager.shared.notification(type: .success)
-                    if let ref = viewModel.claimReference {
-                        let status: ClaimStatus = (viewModel.claimType == .airline) ? .airlineClaimSubmitted : .aesaSubmitted
-                        onClaimSuccess(ref, status)
-                    }
-                    dismiss()
-                }
-            } message: {
+            .fullScreenCover(isPresented: $viewModel.isSuccess) {
                 if let ref = viewModel.claimReference {
-                    if viewModel.claimType == .airline {
-                        Text("Claim Reference: \(ref)\n\nWe have generated the COMPLAINT LETTER for the airline and your MASTER AUTHORIZATION. Please enable the 'Airline First' flow to proceed.")
-                    } else {
-                        Text("Claim Reference: \(ref)\n\nMaster Authorization generated. We will now proceed with the formal submission to AESA.")
-                    }
-                } else {
-                    Text("Your claim has been prepared.")
+                    ClaimSubmissionGuideView(
+                        flight: flight,
+                        claimReference: ref,
+                        onDismiss: {
+                            HapticsManager.shared.notification(type: .success)
+                            let status: ClaimStatus = (viewModel.claimType == .airline) ? .airlineClaimSubmitted : .aesaSubmitted
+                            onClaimSuccess(ref, status)
+                            dismiss()
+                        }
+                    )
                 }
             }
         }

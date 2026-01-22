@@ -35,11 +35,13 @@ final class FlightDetailViewModel: ObservableObject {
         self.eligibilityService = eligibilityService
     }
     
-    func loadFlight(_ flight: Flight) {
+    func loadFlight(_ flight: Flight, skipRefresh: Bool = false) {
         self.flight = flight
         self.timelineEvents = flight.delayEvents
-        startPositionUpdates(for: flight)
-        trackFlight()
+        if !skipRefresh {
+            startPositionUpdates(for: flight)
+            trackFlight()
+        }
         // Check eligibility after tracking completes (handled in trackFlight)
     }
     
@@ -95,8 +97,8 @@ final class FlightDetailViewModel: ObservableObject {
                     print("Flight is scheduled - will track when it becomes active")
                 }
                 
-                // Create new Flight instance with updated values
-                flight = Flight(
+                // Create new Flight instance with updated values, preserving claim data
+                let updatedFlight = Flight(
                     id: flight.id,
                     flightNumber: flight.flightNumber,
                     airline: flight.airline,
@@ -106,8 +108,11 @@ final class FlightDetailViewModel: ObservableObject {
                     scheduledArrival: flight.scheduledArrival,
                     status: flight.status,
                     currentStatus: status,
-                    delayEvents: delayEvents
+                    delayEvents: delayEvents,
+                    claimStatus: flight.claimStatus,
+                    claimReference: flight.claimReference
                 )
+                flight = updatedFlight
                 
                 print("⬅️ [Detail] Final flight object: \(flight.displayFlightNumber) — currentStatus: \(flight.currentStatus.displayName), route: \(flight.route)")
                 
