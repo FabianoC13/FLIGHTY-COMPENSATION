@@ -41,8 +41,11 @@ struct FlightsListView: View {
                 
                 contentView
                 
-                // Floating Action Button
-                floatingActionButton
+                // Floating Action Button - only show when flights exist
+                // (empty state has its own Add Flight button)
+                if !viewModel.flights.isEmpty {
+                    floatingActionButton
+                }
             }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
