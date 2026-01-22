@@ -198,7 +198,11 @@ struct ClassicBoardingPass: View {
             HStack(spacing: 16) {
                 infoItem(label: "FLIGHT", value: flight.displayFlightNumber)
                 infoItem(label: "DATE", value: shortDate(flight.scheduledDeparture))
-                infoItem(label: "TIME", value: formatTime(flight.scheduledDeparture))
+                if let claimDate = flight.claimDate {
+                    infoItem(label: "CLAIMED", value: shortDate(claimDate))
+                } else {
+                    infoItem(label: "TIME", value: formatTime(flight.scheduledDeparture))
+                }
             }
             .padding(.horizontal, 12)
             .padding(.bottom, 12)
@@ -257,7 +261,10 @@ struct ClassicBoardingPass: View {
     
     // MARK: - Helper Views
     private var statusBadge: some View {
-        Text(flight.status.displayName.uppercased())
+        // Prioritize Claim Status if it exists and is not 'notStarted'
+        let displayText = shouldShowClaimStatus ? flight.claimStatus.rawValue.uppercased() : flight.status.displayName.uppercased()
+        
+        return Text(displayText)
             .font(.custom("HelveticaNeue-Bold", size: 9))
             .foregroundStyle(statusColor)
             .padding(.horizontal, 6)
@@ -270,7 +277,15 @@ struct ClassicBoardingPass: View {
             )
     }
     
+    private var shouldShowClaimStatus: Bool {
+        flight.claimStatus != .notStarted
+    }
+    
     private var statusColor: Color {
+        if shouldShowClaimStatus {
+            return Color(hex: flight.claimStatus.colorHex)
+        }
+        
         switch flight.status {
         case .delayed, .cancelled:
             return .orange
