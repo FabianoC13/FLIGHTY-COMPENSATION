@@ -128,7 +128,10 @@ struct FlightsListView: View {
     private var flightList: some View {
         GeometryReader { geometry in
             let screenHeight = geometry.size.height
-            let currentHeight = screenHeight * sheetState.heightRatio - dragTranslation
+            // For empty state, don't allow hidden - minimum is half
+            let minRatio: CGFloat = viewModel.flights.isEmpty ? 0.40 : sheetState.heightRatio
+            let targetRatio = max(sheetState.heightRatio, viewModel.flights.isEmpty ? 0.40 : 0.15)
+            let currentHeight = screenHeight * targetRatio - dragTranslation
             
             ZStack(alignment: .bottom) {
                 // Full-screen Interactive Globe (Background)
@@ -198,7 +201,7 @@ struct FlightsListView: View {
                         }
                     }
                 }
-                .frame(height: max( currentHeight, 0)) // Dynamically update height
+                .frame(height: max(currentHeight, 150)) // Minimum 150pt to prevent collapse
                 .background(
                     RoundedRectangle(cornerRadius: 30)
                         .fill(
@@ -216,15 +219,8 @@ struct FlightsListView: View {
                 .shadow(color: .black.opacity(0.5), radius: 20, x: 0, y: -10)
                 .padding(.horizontal, 12) // Side borders to reveal globe
                 .gesture(
-                    DragGesture()
+                    DragGesture(minimumDistance: 10)
                         .updating($dragTranslation) { value, state, _ in
-                            // Dragging down is positive translation, pulling sheet down (reducing height logic needs to inverse this)
-                            // We want: Pull UP -> Height Increases. Pull DOWN -> Height Decreases.
-                            // Geometry: Height starts at bottom. 
-                            // DragTranslation.height: Positive is DOWN. Negative is UP.
-                            // CurrentHeight formula above: screenHeight * ratio - dragTranslation
-                            // If I drag DOWN (positive), height DECREASES. Correct.
-                            // If I drag UP (negative), height INCREASES. Correct.
                             state = value.translation.height
                         }
                         .onEnded { value in
@@ -245,12 +241,14 @@ struct FlightsListView: View {
                                 // Dragged DOWN
                                 switch sheetState {
                                 case .hidden: nextState = .hidden
-                                case .half: nextState = .hidden
+                                case .half: 
+                                    // For empty state, don't go to hidden
+                                    nextState = viewModel.flights.isEmpty ? .half : .hidden
                                 case .full: nextState = .half
                                 }
                             }
                             
-                            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                            withAnimation(.interactiveSpring(response: 0.35, dampingFraction: 0.85)) {
                                 sheetState = nextState
                             }
                         }
