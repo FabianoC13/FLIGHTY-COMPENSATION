@@ -10,35 +10,71 @@ struct ManualEntryView: View {
     
     var body: some View {
         NavigationStack {
-            Form {
-                Section("Flight Details") {
-                    TextField("Flight Code (e.g., BA178)", text: $flightCode)
-                        .textInputAutocapitalization(.characters)
-                        .autocorrectionDisabled()
-                        .focused($isFlightCodeFocused)
-                        .onAppear {
-                            isFlightCodeFocused = true
-                        }
-                    
-                    DatePicker("Date", selection: $selectedDate, displayedComponents: .date)
-                }
+            ZStack {
+                // Dark gradient background matching AddFlightView
+                LinearGradient(
+                    colors: [
+                        Color(red: 0.06, green: 0.07, blue: 0.14),
+                        Color(red: 0.02, green: 0.02, blue: 0.05)
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
                 
-                Section {
-                    Button("Add Flight") {
-                        addFlight()
+                Form {
+                    Section {
+                        // Custom styled text field
+                        TextField("Flight Code (e.g., BA178)", text: $flightCode)
+                            .textInputAutocapitalization(.characters)
+                            .autocorrectionDisabled()
+                            .focused($isFlightCodeFocused)
+                            .listRowBackground(Color.white.opacity(0.1))
+                            .foregroundStyle(.white)
+                        
+                        DatePicker("Date", selection: $selectedDate, displayedComponents: .date)
+                            .listRowBackground(Color.white.opacity(0.1))
+                            .colorScheme(.dark) // Ensure date picker text is white
+                    } header: {
+                        Text("Flight Details")
+                            .foregroundColor(.white.opacity(0.7))
                     }
-                    .disabled(!isValid)
-                } footer: {
-                    Text("Enter the full flight code: airline code + flight number (e.g., BA178, FR1234, LH441). Minimum 3 characters.")
+                    
+                    Section {
+                        Button(action: {
+                            addFlight()
+                        }) {
+                            Text("Add Flight")
+                                .frame(maxWidth: .infinity)
+                                .bold()
+                        }
+                        .disabled(!isValid)
+                        .listRowBackground(
+                            Group {
+                                if isValid {
+                                    PremiumTheme.primaryGradient
+                                } else {
+                                    Color.white.opacity(0.1)
+                                }
+                            }
+                        )
+                        .foregroundStyle(isValid ? .white : .white.opacity(0.3))
+                    } footer: {
+                        Text("Enter the full flight code: airline code + flight number (e.g., BA178, FR1234, LH441). Minimum 3 characters.")
+                            .foregroundColor(.white.opacity(0.5))
+                    }
                 }
+                .scrollContentBackground(.hidden)
             }
             .navigationTitle("Enter Flight")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") {
                         dismiss()
                     }
+                    .foregroundColor(.white)
                 }
             }
         }
