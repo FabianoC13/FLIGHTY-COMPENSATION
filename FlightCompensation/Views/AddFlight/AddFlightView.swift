@@ -38,12 +38,12 @@ struct AddFlightView: View {
                             .padding(.horizontal, AppConstants.spacing)
                         
                         VStack(spacing: AppConstants.spacing) {
-                            // Import from Wallet (Primary)
+                            // Import from Wallet
                             AddFlightMethodButton(
                                 icon: "wallet.pass",
                                 title: "Import from Wallet",
                                 subtitle: "Fastest option",
-                                isPrimary: true
+                                isPrimary: false
                             ) {
                                 Task {
                                     await viewModel.importFromWallet()
