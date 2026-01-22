@@ -9,7 +9,7 @@ struct FlightsListView: View {
     @State private var navigatingToClaimFlight: Flight?
     
     // Map style toggle
-    @State private var isSatelliteMap: Bool = true
+    @State private var isSatelliteMap: Bool = false
     
     // State for draggable sheet
     @State private var sheetState: SheetState = .half
