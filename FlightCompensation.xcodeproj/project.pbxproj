@@ -40,6 +40,7 @@
 		678D342A738387C20B2DB178 /* FlightMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBA0F377AF883A27A1986F6F /* FlightMapView.swift */; };
 		67E730BD156FAF7DA75D82C5 /* BackgroundTrackingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C63580537CC6F4293A1F0A /* BackgroundTrackingManager.swift */; };
 		703B83D3C0CEEF3FCB805157 /* CustomDesignComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE40B2B4C643B9A379BF3F55 /* CustomDesignComponents.swift */; };
+		EMPTY1234567890ABCDEF01 /* EmptyStateEducationalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EMPTY1234567890ABCDEF00 /* EmptyStateEducationalView.swift */; };
 		70A0D78B7499E6B4CF55F4E1 /* PayoutIntegrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 963A597C4AE7DFA490D1FBDF /* PayoutIntegrationView.swift */; };
 		734C01DF9BD28105F4495600 /* CompensationEligibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DEF14557735DF4CCDA16995 /* CompensationEligibility.swift */; };
 		77CA2AD2283CC0E14BFE1A9C /* SubmissionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8538B3892E4E1A23E1C872ED /* SubmissionService.swift */; };
@@ -94,6 +95,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		EMPTY1234567890ABCDEF00 /* EmptyStateEducationalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateEducationalView.swift; sourceTree = "<group>"; };
 		042999E223326F06FC59DACF /* AddFlightView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFlightView.swift; sourceTree = "<group>"; };
 		09535ED8233DC70E3EC4B2CB /* ShareSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSheet.swift; sourceTree = "<group>"; };
 		103AA8B5F1B5ECFB3246AEEF /* ClassicBoardingPass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassicBoardingPass.swift; sourceTree = "<group>"; };
@@ -286,6 +288,7 @@
 			isa = PBXGroup;
 			children = (
 				FE40B2B4C643B9A379BF3F55 /* CustomDesignComponents.swift */,
+				EMPTY1234567890ABCDEF00 /* EmptyStateEducationalView.swift */,
 				8629BBB183C89BE4F2C4FF79 /* LiveTextScanner.swift */,
 				3063C1CA60E99214D25251C8 /* SignatureCanvas.swift */,
 				AAC80951D5CB55E1D4140A0B /* WalletPassView.swift */,
@@ -507,6 +510,7 @@
 				27A756D00F91ECD409C4B86B /* Config.swift in Sources */,
 				86D7F0FC353B46ED22201A3B /* Constants.swift in Sources */,
 				703B83D3C0CEEF3FCB805157 /* CustomDesignComponents.swift in Sources */,
+				EMPTY1234567890ABCDEF01 /* EmptyStateEducationalView.swift in Sources */,
 				53E7B38746CCE981E2F69CD3 /* Date+Extensions.swift in Sources */,
 				F94DDFB4DB4C12E0ED66D25B /* DelayEvent.swift in Sources */,
 				7990F5ADE68088161E2C2F00 /* DocumentUploadView.swift in Sources */,

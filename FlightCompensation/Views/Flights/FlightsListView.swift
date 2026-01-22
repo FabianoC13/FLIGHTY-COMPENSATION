@@ -145,35 +145,10 @@ struct FlightsListView: View {
                         .frame(maxWidth: .infinity)
                     
                     if viewModel.flights.isEmpty {
-                        // Empty State Content
-                        VStack(spacing: 24) {
-                            Image(systemName: "airplane")
-                                .font(.system(size: 60))
-                                .foregroundStyle(PremiumTheme.electricBlue.opacity(0.6))
-                                .shadow(color: PremiumTheme.electricBlue.opacity(0.3), radius: 15)
-                            
-                            VStack(spacing: 8) {
-                                Text("No flights yet")
-                                    .font(.title3)
-                                    .fontWeight(.bold)
-                                    .foregroundStyle(.white)
-                                
-                                Text("Add your first flight to start tracking")
-                                    .font(.body)
-                                    .foregroundColor(.white.opacity(0.7))
-                                    .multilineTextAlignment(.center)
-                            }
-                            
-                            GradientButton(
-                                title: "Add Flight",
-                                icon: "plus",
-                                gradient: PremiumTheme.primaryGradient,
-                                action: { showAddFlight = true }
-                            )
-                            .padding(.horizontal, 40)
-                        }
-                        .padding(.top, 40)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        // Educational Empty State
+                        EmptyStateEducationalView(onAddFlight: {
+                            showAddFlight = true
+                        })
                     } else {
                         // Flight List Content
                         VStack(alignment: .leading, spacing: 0) {
