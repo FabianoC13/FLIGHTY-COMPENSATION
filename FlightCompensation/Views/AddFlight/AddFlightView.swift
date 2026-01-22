@@ -26,12 +26,12 @@ struct AddFlightView: View {
                 
                 VStack(spacing: 0) {
                     VStack(spacing: AppConstants.largeSpacing) {
-                        Text("Add Flight")
+                        Text("Start Claim")
                             .font(.system(size: 28, weight: .bold))
                             .foregroundColor(.white)
                             .padding(.top, AppConstants.largeSpacing)
                         
-                        Text("Choose the fastest way to add your flight")
+                        Text("Choose the fastest way to start your claim")
                             .font(.system(size: 16))
                             .foregroundColor(.white.opacity(0.6))
                             .multilineTextAlignment(.center)
