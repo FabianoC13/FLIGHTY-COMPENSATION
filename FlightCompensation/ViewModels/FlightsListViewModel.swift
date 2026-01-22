@@ -142,7 +142,8 @@ final class FlightsListViewModel: ObservableObject {
                     currentStatus: status,
                     delayEvents: delayEvents,
                     claimStatus: updatedFlight.claimStatus,
-                    claimReference: updatedFlight.claimReference
+                    claimReference: updatedFlight.claimReference,
+                    claimDate: updatedFlight.claimDate
                 )
                 
                 // Update flight in the list with all new data

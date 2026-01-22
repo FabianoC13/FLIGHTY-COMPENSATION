@@ -112,8 +112,16 @@ struct FlightsListView: View {
             }
             .navigationDestination(item: $navigatingToClaimFlight) { flight in
                 ClaimFlowView(flight: flight, onClaimSuccess: { reference, status in
-                    // On success, we might want to refresh flight status or show a success message
-                    // For now, we just return to the list (which this callback allows by dismissing)
+                    // Manually update the flight with the new claim status and date
+                    var updatedFlight = flight
+                    updatedFlight.claimStatus = status
+                    updatedFlight.claimReference = reference
+                    updatedFlight.claimDate = Date()
+                    
+                    // Update the view model immediately
+                    viewModel.updateFlight(updatedFlight)
+                    
+                    // Also trigger a refresh, but the local update above ensures instant UI feedback
                     Task {
                         await refreshFlights()
                     }
