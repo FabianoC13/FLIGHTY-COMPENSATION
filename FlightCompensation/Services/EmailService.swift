@@ -31,7 +31,9 @@ struct EmailService {
                     "attachments": attachments.map { attachment in
                         [
                             "filename": attachment.filename,
-                            "content": attachment.data.base64EncodedString()
+                            "content": attachment.data.base64EncodedString(),
+                            "contentType": "application/pdf",
+                            "encoding": "base64"
                         ]
                     }
                 ],

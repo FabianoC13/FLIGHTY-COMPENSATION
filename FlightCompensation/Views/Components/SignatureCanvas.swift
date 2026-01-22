@@ -6,7 +6,8 @@ struct SignatureCanvas: UIViewRepresentable {
     var onDraw: () -> Void
     
     func makeUIView(context: Context) -> PKCanvasView {
-        canvasView.tool = PKInkingTool(.pen, color: .black, width: 2)
+        // Use fixed black color (non-adaptive) to ensure visibility on white paper background
+        canvasView.tool = PKInkingTool(.pen, color: UIColor(red: 0, green: 0, blue: 0, alpha: 1), width: 3)
         canvasView.drawingPolicy = .anyInput
         canvasView.backgroundColor = .clear // Let SwiftUI background show through
         canvasView.overrideUserInterfaceStyle = .light // Force light mode (Paper look)
