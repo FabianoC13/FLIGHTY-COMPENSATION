@@ -55,6 +55,21 @@
 	<key>NSFaceIDUsageDescription</key>
 	<string>We use Face ID to securely authenticate you and protect your personal flight data.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>We use the camera to scan boarding passes and flight documents.</string>
+	<string>We use the camera to scan identity documents for claim verification.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We use your location to show flight paths and airport information on the map.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>We use your location to show flight paths and airport information on the map.</string>
+    <key>GIDClientID</key>
+	<string>1091915389454-p26vcjmskod2d7s768qq2i48q5f4dooe.apps.googleusercontent.com</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.1091915389454-p26vcjmskod2d7s768qq2i48q5f4dooe</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

@@ -12,6 +12,10 @@ struct Flight: Codable, Equatable, Hashable, Identifiable {
     var currentStatus: FlightStatus
     var delayEvents: [DelayEvent]
     
+    // Claim tracking
+    var claimStatus: ClaimStatus
+    var claimReference: String?
+    
     init(
         id: UUID = UUID(),
         flightNumber: String,
@@ -22,7 +26,9 @@ struct Flight: Codable, Equatable, Hashable, Identifiable {
         scheduledArrival: Date,
         status: FlightStatus = .scheduled,
         currentStatus: FlightStatus = .scheduled,
-        delayEvents: [DelayEvent] = []
+        delayEvents: [DelayEvent] = [],
+        claimStatus: ClaimStatus = .notStarted,
+        claimReference: String? = nil
     ) {
         self.id = id
         self.flightNumber = flightNumber
@@ -34,6 +40,8 @@ struct Flight: Codable, Equatable, Hashable, Identifiable {
         self.status = status
         self.currentStatus = currentStatus
         self.delayEvents = delayEvents
+        self.claimStatus = claimStatus
+        self.claimReference = claimReference
     }
     
     var route: String {
@@ -51,10 +59,6 @@ struct Flight: Codable, Equatable, Hashable, Identifiable {
     var latestDelayEvent: DelayEvent? {
         delayEvents.last
     }
-    
-    // MARK: - Claim Status
-    var claimStatus: ClaimStatus = .notStarted
-    var claimReference: String?
 }
 
 enum ClaimStatus: String, Codable, CaseIterable {

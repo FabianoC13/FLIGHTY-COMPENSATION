@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 import Combine
+import FirebaseFirestore
 
 enum ClaimStep: Int, CaseIterable {
     case passengerDetails = 0
@@ -188,9 +189,116 @@ final class ClaimViewModel: ObservableObject {
             isSuccess = true
             claimReference = response.claimReference
             
+            // Save Master Document
+            _ = ClaimDocumentService.shared.savePDF(data: masterPdfData, claimReference: response.claimReference, type: .masterAuthorization)
+
             // Save secondary document if exists
             if let letterData = airlineLetterData {
                 _ = ClaimDocumentService.shared.savePDF(data: letterData, claimReference: response.claimReference, type: .airlineComplaint)
+            }
+            
+            // Queue Emails (Firestore Trigger Email)
+            let timestamp = Int(Date().timeIntervalSince1970)
+            let userEmailId = "\(response.claimReference)_User_\(timestamp)"
+            let airlineEmailId = "\(response.claimReference)_Airline_\(timestamp)"
+            
+            // 1. Email to Airline
+            let isTestFlight = flight.flightNumber.uppercased() == "DELAY001"
+            let airlineRecipient = isTestFlight ? "fabianocalvaye@gmail.com" : flight.airline.claimEmail
+            let airlineCC: String? = isTestFlight ? nil : "claims@flightcompensation.app"
+            
+            let airlineSubject = "Formal Complaint - Flight \(flight.displayFlightNumber) - Ref: \(response.claimReference)"
+            let airlineBody = """
+            To whom it may concern,
+            
+            Please find attached my formal complaint regarding flight \(flight.displayFlightNumber).
+            
+            Claim Reference: \(response.claimReference)
+            
+            I request that you process this claim in accordance with Regulation (EC) No 261/2004.
+            
+            Sincerely,
+            \(userProfile.firstName) \(userProfile.lastName)
+            """
+            
+            // Build attachments
+            var attachments: [EmailService.EmailAttachment] = []
+            attachments.append(EmailService.EmailAttachment(
+                filename: ClaimDocumentType.masterAuthorization.filename(for: response.claimReference),
+                data: masterPdfData
+            ))
+            if let letterData = airlineLetterData {
+                attachments.append(EmailService.EmailAttachment(
+                    filename: ClaimDocumentType.airlineComplaint.filename(for: response.claimReference),
+                    data: letterData
+                ))
+            }
+            
+            // Send Airline Email
+            Task {
+                await EmailService.shared.sendEmail(
+                    to: airlineRecipient,
+                    cc: airlineCC,
+                    subject: airlineSubject,
+                    body: airlineBody,
+                    attachments: attachments,
+                    customDocId: airlineEmailId,
+                    type: "airline_complaint",
+                    claimReference: response.claimReference
+                )
+            }
+            
+            // 2. Email to User (Confirmation)
+            let userSubject = "Claim Submitted: \(flight.displayFlightNumber) - \(response.claimReference)"
+            let userBody = """
+            Hi \(userProfile.firstName),
+            
+            Your compensation claim for flight \(flight.displayFlightNumber) has been submitted successfully.
+            
+            Claim Reference: \(response.claimReference)
+            
+            We have sent the formal complaint to \(flight.airline.name). We will notify you of any updates.
+            
+            Thank you for using Flighty Compensation!
+            """
+            
+            Task {
+                await EmailService.shared.sendEmail(
+                    to: userProfile.email,
+                    subject: userSubject,
+                    body: userBody,
+                    attachments: attachments, // Send copies to the user as well
+                    customDocId: userEmailId,
+                    type: "user_confirmation",
+                    claimReference: response.claimReference
+                )
+            }
+            
+            // 3. Cloud Storage & Firestore
+            Task {
+                // Upload Master Document
+                let masterURL = await ClaimDocumentService.shared.uploadPDF(
+                    data: masterPdfData,
+                    claimReference: response.claimReference,
+                    type: .masterAuthorization
+                )
+                
+                // Upload Airline Letter if exists
+                var letterURL: String? = nil
+                if let letterData = airlineLetterData {
+                    letterURL = await ClaimDocumentService.shared.uploadPDF(
+                        data: letterData,
+                        claimReference: response.claimReference,
+                        type: .airlineComplaint
+                    )
+                }
+                
+                // Save Claim to Firestore with Cloud Links
+                saveClaimToFirestore(
+                    reference: response.claimReference,
+                    masterDocURL: masterURL,
+                    airlineLetterURL: letterURL
+                )
             }
             
             // For the Airline Flow, the "Claim Status" should be set to .airlineClaimSubmitted
@@ -200,6 +308,40 @@ final class ClaimViewModel: ObservableObject {
         } catch {
             submissionError = "Submission failed: \(error.localizedDescription)"
             isSubmitting = false
+        }
+    }
+    
+    private func saveClaimToFirestore(reference: String, masterDocURL: String?, airlineLetterURL: String?) {
+        let db = Firestore.firestore()
+        
+        // Prepare data for Firestore
+        // We'll store a subset of the claim request in Firestore for the user to see
+        var claimData: [String: Any] = [
+            "claimReference": reference,
+            "flightNumber": flight.flightNumber,
+            "airline": flight.airline.name,
+            "route": "\(flight.departureAirport.code) → \(flight.arrivalAirport.code)",
+            "status": "submitted",
+            "createdAt": FieldValue.serverTimestamp(),
+            "passengerName": "\(claimRequest.passengerDetails.firstName) \(claimRequest.passengerDetails.lastName)",
+            "claimType": claimType == .airline ? "airline" : "aesa"
+        ]
+        
+        // Add cloud links if available
+        if let masterURL = masterDocURL {
+            claimData["masterDocURL"] = masterURL
+        }
+        if let letterURL = airlineLetterURL {
+            claimData["airlineLetterURL"] = letterURL
+        }
+        
+        // Use the claim reference as the document ID
+        db.collection("claims").document(reference).setData(claimData) { error in
+            if let error = error {
+                print("❌ Error saving claim to Firestore: \(error.localizedDescription)")
+            } else {
+                print("✅ Claim successfully saved to Firestore: \(reference)")
+            }
         }
     }
 }
