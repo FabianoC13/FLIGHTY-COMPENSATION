@@ -5,6 +5,7 @@ protocol FlightStorageServiceProtocol {
     func save(flights: [Flight])
     func load() -> [Flight]
     func fetchFlights() async throws -> [Flight]
+    func moveToHistory(flight: Flight) async throws
 }
 
 final class FlightStorageService: FlightStorageServiceProtocol {
@@ -88,6 +89,47 @@ final class FlightStorageService: FlightStorageServiceProtocol {
     
     // MARK: - Private Helpers
     
+    
+    func moveToHistory(flight: Flight) async throws {
+        // Ensure user is signed in (so we have a stable userId namespace)
+        if auth.currentUser == nil {
+            try await auth.signInAnonymously()
+        }
+        
+        // Always update local cache immediately, even if cloud auth isn't available
+        // (keeps UI + disk in sync with the user's action).
+        var currentFlights = load()
+        currentFlights.removeAll { $0.id == flight.id }
+        saveLocally(flights: currentFlights)
+        
+        // If we still don't have a user, we can't sync to Firestore.
+        guard let userId = auth.currentUser?.uid else {
+            print("⚠️ No authenticated user. Skipping cloud moveToHistory; local cache updated.")
+            return
+        }
+        
+        let flightRef = db.collection("users").document(userId).collection("flights").document(flight.id.uuidString)
+        let historyRef = db.collection("users").document(userId).collection("history").document(flight.id.uuidString)
+        
+        // Use a transaction to move the document
+        try await db.runTransaction { (transaction, errorPointer) -> Any? in
+            // 1. Write to history
+            do {
+                try transaction.setData(from: flight, forDocument: historyRef)
+            } catch let error as NSError {
+                errorPointer?.pointee = error
+                return nil
+            }
+            
+            // 2. Delete from active flights
+            transaction.deleteDocument(flightRef)
+            
+            return nil
+        }
+        
+        print("✅ Moved flight \(flight.id) to history in cloud.")
+    }
+
     private func syncToCloud(flights: [Flight]) {
         guard let userId = auth.currentUser?.uid else { return }
         

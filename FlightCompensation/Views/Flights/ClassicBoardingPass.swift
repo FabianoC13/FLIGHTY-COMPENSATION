@@ -4,31 +4,50 @@ import SwiftUI
 struct ClassicBoardingPass: View {
     let flight: Flight
     let onTap: () -> Void
+    let onDelete: () -> Void
     
     @State private var isTorn = false
-    
-    // Unused font properties removed
+    @State private var offset: CGFloat = 0
+    @State private var isSwiped = false
     
     var body: some View {
-        Button(action: {
-            // Trigger tear-off animation
-            withAnimation(.easeInOut(duration: 0.4)) {
-                isTorn = true
-            }
-            
-            // Haptic feedback
-            let generator = UIImpactFeedbackGenerator(style: .heavy)
-            generator.impactOccurred()
-            
-            // Delay navigation to let animation play
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                onTap()
-                // Reset state after navigation (so it's ready when coming back)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    isTorn = false
+        ZStack {
+            // Background Delete Button (circular with text below) - only visible when swiping
+            if offset < 0 {
+                HStack {
+                    Spacer()
+                    VStack(spacing: 8) {
+                        Button(action: {
+                            HapticsManager.shared.notification(type: .warning)
+                            withAnimation(.spring()) {
+                                offset = -500 // Slide out completely
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                onDelete()
+                            }
+                        }) {
+                            Circle()
+                                .fill(Color.red)
+                                .frame(width: 56, height: 56)
+                                .overlay(
+                                    Image(systemName: "trash.fill")
+                                        .font(.system(size: 22, weight: .medium))
+                                        .foregroundColor(.white)
+                                )
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        
+                        Text("Delete")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.white)
+                    }
+                    .frame(maxHeight: .infinity)
+                    .padding(.trailing, 20)
+                    .opacity(Double(-offset) / 90.0) // Fade in as user swipes
                 }
             }
-        }) {
+            
+            // The Card
             HStack(spacing: 0) {
                 // Main ticket section
                 mainSection
@@ -45,10 +64,58 @@ struct ClassicBoardingPass: View {
                     .opacity(isTorn ? 0 : 1)
                     .zIndex(0)
             }
-            // Glassmorphism - Outer Glow removed as requested
-            // .shadow(color: statusGlowColor.opacity(0.5), radius: 10, x: 0, y: 0)
+            .contentShape(Rectangle())
+            .offset(x: offset)
+            .gesture(
+                DragGesture(minimumDistance: 20, coordinateSpace: .local)
+                    .onChanged { value in
+                        // Only allow horizontal swipe to the left
+                        if value.translation.width < 0 && abs(value.translation.width) > abs(value.translation.height) {
+                            let maxOffset: CGFloat = -90
+                            offset = max(value.translation.width, maxOffset)
+                        }
+                    }
+                    .onEnded { value in
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                            if value.translation.width < -50 {
+                                offset = -90
+                                isSwiped = true
+                            } else {
+                                offset = 0
+                                isSwiped = false
+                            }
+                        }
+                    }
+            )
+            .simultaneousGesture(
+                TapGesture()
+                    .onEnded {
+                        if isSwiped {
+                            withAnimation(.spring()) {
+                                offset = 0
+                                isSwiped = false
+                            }
+                        } else {
+                            // Trigger tear-off animation
+                            withAnimation(.easeInOut(duration: 0.4)) {
+                                isTorn = true
+                            }
+                            
+                            // Haptic feedback
+                            let generator = UIImpactFeedbackGenerator(style: .heavy)
+                            generator.impactOccurred()
+                            
+                            // Delay navigation to let animation play
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                onTap()
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                    isTorn = false
+                                }
+                            }
+                        }
+                    }
+            )
         }
-        .buttonStyle(PlainButtonStyle())
     }
     
     // MARK: - Main Section (Left 70%)

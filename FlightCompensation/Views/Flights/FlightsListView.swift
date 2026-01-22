@@ -7,6 +7,9 @@ struct FlightsListView: View {
     @State private var showSettings = false
     @State private var selectedFlight: Flight?
     
+    // Map style toggle
+    @State private var isSatelliteMap: Bool = true
+    
     // State for draggable sheet
     @State private var sheetState: SheetState = .half
     @GestureState private var dragTranslation: CGFloat = 0
@@ -49,12 +52,34 @@ struct FlightsListView: View {
                         HapticsManager.shared.impact(style: .light)
                         showSettings = true
                     }) {
-                        Image(systemName: "person.crop.circle")
-                            .font(.system(size: 20))
-                            .foregroundStyle(.white.opacity(0.8))
+                        ZStack {
+                            Circle()
+                                .fill(Color(red: 0.15, green: 0.17, blue: 0.20))
+                                .frame(width: 36, height: 36)
+                            Image(systemName: "person.fill")
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundColor(.white.opacity(0.9))
+                        }
                     }
+                    .buttonStyle(.plain)
                 }
                 
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        HapticsManager.shared.selection()
+                        isSatelliteMap.toggle()
+                    }) {
+                        ZStack {
+                            Circle()
+                                .fill(Color(red: 0.15, green: 0.17, blue: 0.20))
+                                .frame(width: 36, height: 36)
+                            Image(systemName: isSatelliteMap ? "map.fill" : "globe.americas.fill")
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundColor(.white.opacity(0.9))
+                        }
+                    }
+                    .buttonStyle(.plain)
+                }
 
             }
             .sheet(isPresented: $showSettings) {
@@ -107,7 +132,7 @@ struct FlightsListView: View {
             
             ZStack(alignment: .bottom) {
                 // Full-screen Interactive Globe (Background)
-                FlightsGlobeView(flights: viewModel.flights)
+                FlightsGlobeView(flights: viewModel.flights, isSatelliteView: $isSatelliteMap)
                     .ignoresSafeArea()
                 
                 // Floating Sheet (Overlay)
@@ -170,12 +195,18 @@ struct FlightsListView: View {
                             ScrollView {
                                 LazyVStack(spacing: 20) {
                                     ForEach(viewModel.flights) { flight in
-                                        ClassicBoardingPass(flight: flight) {
-                                            HapticsManager.shared.selection()
-                                            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                                                selectedFlight = flight
+                                        ClassicBoardingPass(
+                                            flight: flight,
+                                            onTap: {
+                                                HapticsManager.shared.selection()
+                                                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                                                    selectedFlight = flight
+                                                }
+                                            },
+                                            onDelete: {
+                                                viewModel.deleteFlight(flight)
                                             }
-                                        }
+                                        )
                                     }
                                 }
                                 .padding(.horizontal, 16)

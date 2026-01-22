@@ -84,7 +84,7 @@ struct ClaimEvidence: Codable {
     }
     
     var isComplete: Bool {
-        boardingPassImage != nil && identityDocumentImage != nil
+        identityDocumentImage != nil
     }
 }
 

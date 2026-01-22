@@ -1,85 +1,66 @@
 import Foundation
+import FirebaseFirestore
 
-/// Service to send email requests to the local email server
-/// This only works in the simulator where localhost is shared with the Mac
+/// Service to send email requests via Firestore (Trigger Email extension)
 struct EmailService {
     static let shared = EmailService()
-    
-    #if targetEnvironment(simulator)
-    private let serverURL = URL(string: "http://localhost:8080/send-email")!
-    #else
-    private let serverURL: URL? = nil
-    #endif
+    private let db = Firestore.firestore()
     
     struct EmailAttachment {
         let filename: String
         let data: Data
     }
     
-    struct EmailRequest: Encodable {
-        let to: String
-        let cc: String?
-        let subject: String
-        let body: String
-        let attachments: [AttachmentPayload]
-        
-        struct AttachmentPayload: Encodable {
-            let filename: String
-            let data: String // Base64 encoded
-        }
-    }
-    
-    /// Send an email via the local server (Simulator only)
+    /// Send an email by creating a document in the 'mail' collection
     func sendEmail(
         to: String,
-        cc: String?,
+        cc: String? = nil,
         subject: String,
         body: String,
-        attachments: [EmailAttachment]
+        attachments: [EmailAttachment] = [],
+        customDocId: String? = nil,
+        type: String? = nil,
+        claimReference: String? = nil
     ) async -> Bool {
-        #if targetEnvironment(simulator)
         do {
-            var request = URLRequest(url: serverURL)
-            request.httpMethod = "POST"
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.timeoutInterval = 30
-            
-            let emailRequest = EmailRequest(
-                to: to,
-                cc: cc,
-                subject: subject,
-                body: body,
-                attachments: attachments.map { attachment in
-                    EmailRequest.AttachmentPayload(
-                        filename: attachment.filename,
-                        data: attachment.data.base64EncodedString()
-                    )
-                }
-            )
-            
-            request.httpBody = try JSONEncoder().encode(emailRequest)
-            
-            let (data, response) = try await URLSession.shared.data(for: request)
-            
-            if let httpResponse = response as? HTTPURLResponse {
-                if httpResponse.statusCode == 200 {
-                    print("✅ Email sent successfully via local server")
-                    return true
-                } else {
-                    if let errorResponse = try? JSONDecoder().decode([String: String].self, from: data) {
-                        print("❌ Email server error: \(errorResponse["error"] ?? "Unknown")")
+            var mailData: [String: Any] = [
+                "to": [to],
+                "message": [
+                    "subject": subject,
+                    "text": body,
+                    "attachments": attachments.map { attachment in
+                        [
+                            "filename": attachment.filename,
+                            "content": attachment.data.base64EncodedString()
+                        ]
                     }
-                    return false
-                }
+                ],
+                "createdAt": FieldValue.serverTimestamp()
+            ]
+            
+            if let cc = cc {
+                mailData["cc"] = [cc]
             }
-            return false
+            
+            if let type = type {
+                mailData["type"] = type
+            }
+            
+            if let claimRef = claimReference {
+                mailData["claimReference"] = claimRef
+            }
+            
+            if let docId = customDocId {
+                try await db.collection("mail").document(docId).setData(mailData)
+            } else {
+                _ = try await db.collection("mail").addDocument(data: mailData)
+            }
+            
+            print("✅ Email queued in Firestore successfully")
+            return true
         } catch {
-            print("❌ Failed to send email via local server: \(error.localizedDescription)")
+            print("❌ Failed to queue email in Firestore: \(error.localizedDescription)")
             return false
         }
-        #else
-        print("⚠️ EmailService only works in simulator")
-        return false
-        #endif
     }
 }

@@ -47,6 +47,7 @@
 		7990F5ADE68088161E2C2F00 /* DocumentUploadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D99DAD4D638AEAFF16B34015 /* DocumentUploadView.swift */; };
 		7A068ECCAD2BA7D1580642F9 /* FlightsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E56C04532B39F5A5A6AED62 /* FlightsListView.swift */; };
 		7A30F53CF766A6F461C5EC84 /* PayoutDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43F214EAD172B8FFDC451189 /* PayoutDetailsView.swift */; };
+		8306AE802F329E0BDF34731B /* SplashScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D0DD59B684E692F43E70848 /* SplashScreenView.swift */; };
 		85ADEFA2C621F5B71BFE8638 /* PayoutService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91602F80F0119DC8AAC43A4D /* PayoutService.swift */; };
 		86D7F0FC353B46ED22201A3B /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF93009479756E691366BE73 /* Constants.swift */; };
 		894FBD7945BF744E1DE7FBAB /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 0766CCFB58EB9093D45C0FE6 /* FirebaseStorage */; };
@@ -73,6 +74,7 @@
 		C78ED8433B728991FC4A432B /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 525BC4EE095840E0A981F912 /* FirebaseAuth */; };
 		CA34234B240A0E66186DC5F5 /* PDFService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AEFD579977E5837534CBEE7 /* PDFService.swift */; };
 		CE5266A149D2CE2B0413D82C /* ClassicBoardingPass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103AA8B5F1B5ECFB3246AEEF /* ClassicBoardingPass.swift */; };
+		FR0WV1EW12345678901234AB /* FlightRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FR0WV1EW12345678FILEREF0 /* FlightRowView.swift */; };
 		D05AC2A02FE0C53FD90B73FD /* Flight.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD7F48DD519272D4BC37B52D /* Flight.swift */; };
 		D09E3300723B25ECD4A262DE /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B56C79C6AACEE1821E9E6A0 /* OnboardingView.swift */; };
 		D6A22967AE8CBB37F39AD798 /* Airport.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE7E98E67D67AD7B82FB2EF1 /* Airport.swift */; };
@@ -103,9 +105,11 @@
 		17F684CFB28DDE5D64D2836C /* ClaimViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimViewModel.swift; sourceTree = "<group>"; };
 		1A563C2AF45F8C9A15B0FAB5 /* WelcomeCarouselView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeCarouselView.swift; sourceTree = "<group>"; };
 		1B5367A4D9D3C8633F9B2A26 /* FlightCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightCardView.swift; sourceTree = "<group>"; };
+		FR0WV1EW12345678FILEREF0 /* FlightRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightRowView.swift; sourceTree = "<group>"; };
 		1DF90E5C47C7C2D4AF610804 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		2839876A2950D0A1CA830F08 /* IBANValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IBANValidator.swift; sourceTree = "<group>"; };
 		292D2E7CBA2A75832E962DE1 /* FlightsListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightsListViewModel.swift; sourceTree = "<group>"; };
+		2D0DD59B684E692F43E70848 /* SplashScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreenView.swift; sourceTree = "<group>"; };
 		2DDB34EC44CEBB799CCED9B1 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		2DEF14557735DF4CCDA16995 /* CompensationEligibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompensationEligibility.swift; sourceTree = "<group>"; };
 		2E56C04532B39F5A5A6AED62 /* FlightsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightsListView.swift; sourceTree = "<group>"; };
@@ -298,6 +302,7 @@
 				C43CF714A29636078F5A230F /* Flights */,
 				562450DA03031B09784C7062 /* Onboarding */,
 				83E565DFA3B43C9F98629276 /* Settings */,
+				C37D7111913CE5945F0C440B /* Splash */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -317,6 +322,14 @@
 			path = FlightCompensation;
 			sourceTree = "<group>";
 		};
+		C37D7111913CE5945F0C440B /* Splash */ = {
+			isa = PBXGroup;
+			children = (
+				2D0DD59B684E692F43E70848 /* SplashScreenView.swift */,
+			);
+			path = Splash;
+			sourceTree = "<group>";
+		};
 		C43CF714A29636078F5A230F /* Flights */ = {
 			isa = PBXGroup;
 			children = (
@@ -324,6 +337,7 @@
 				1B5367A4D9D3C8633F9B2A26 /* FlightCardView.swift */,
 				FC1BF6C2281902F8A1C52E25 /* FlightDetailView.swift */,
 				BBA0F377AF883A27A1986F6F /* FlightMapView.swift */,
+				FR0WV1EW12345678FILEREF0 /* FlightRowView.swift */,
 				ED63B3CDC9D1FA26A3BE11C8 /* FlightsGlobeView.swift */,
 				2E56C04532B39F5A5A6AED62 /* FlightsListView.swift */,
 				671526ECF792E0B84649AB83 /* FlightTimelineView.swift */,
@@ -501,6 +515,7 @@
 				221B7BCA7B63C6F4E0C154EB /* EmailService.swift in Sources */,
 				D05AC2A02FE0C53FD90B73FD /* Flight.swift in Sources */,
 				0F06A7158C7A4FA5FD250FCB /* FlightCardView.swift in Sources */,
+				FR0WV1EW12345678901234AB /* FlightRowView.swift in Sources */,
 				14BA72D1EDDE450AAA6A120A /* FlightCompensationApp.swift in Sources */,
 				2080AA3D74EF65C3A15A578F /* FlightDelayAnimationView.swift in Sources */,
 				59E8DA401902C269A10A64FD /* FlightDetailView.swift in Sources */,
@@ -539,6 +554,7 @@
 				003B86743564782234CD221E /* SettingsProfileView.swift in Sources */,
 				B7992D411021731F9FBB14CD /* ShareSheet.swift in Sources */,
 				96F4ADFB2CCE38FE1BC7B688 /* SignatureCanvas.swift in Sources */,
+				8306AE802F329E0BDF34731B /* SplashScreenView.swift in Sources */,
 				77CA2AD2283CC0E14BFE1A9C /* SubmissionService.swift in Sources */,
 				FE1214BFCD8BA9C5439901EF /* TicketScanView.swift in Sources */,
 				E8F76C0A945CAE0EEF0E116E /* UserProfile.swift in Sources */,
