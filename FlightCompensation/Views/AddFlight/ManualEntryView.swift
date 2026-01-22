@@ -42,7 +42,7 @@ struct ManualEntryView: View {
                         Button(action: {
                             addFlight()
                         }) {
-                            Text("Add Flight")
+                            Text("Start Claim")
                                 .frame(maxWidth: .infinity)
                                 .bold()
                         }
