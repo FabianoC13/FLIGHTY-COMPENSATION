@@ -334,8 +334,9 @@ struct ClassicBoardingPass: View {
     
     private func shortDate(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "dd/MM"
-        return formatter.string(from: date)
+        formatter.locale = Locale(identifier: "en_GB") // Ensure consistency
+        formatter.dateFormat = "dd MMM"
+        return formatter.string(from: date).uppercased()
     }
 }
 
