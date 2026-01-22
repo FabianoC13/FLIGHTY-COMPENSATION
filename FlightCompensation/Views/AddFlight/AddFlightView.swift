@@ -133,38 +133,66 @@ struct AddFlightMethodButton: View {
             HStack(spacing: AppConstants.spacing) {
                 Image(systemName: icon)
                     .font(.system(size: 24))
-                    .foregroundColor(isPrimary ? .white : PremiumTheme.electricBlue)
-                    .frame(width: 50, height: 50)
-                    .background(isPrimary ? Color.white.opacity(0.2) : PremiumTheme.electricBlue.opacity(0.15))
-                    .cornerRadius(12)
+                    // Icon color logic handled in ButtonStyle based on configuration
+                    // We'll pass the view content structure here, but styling moves to ButtonStyle
+                    // However, due to complex internal styling depending on state, 
+                    // a custom ButtonStyle is the cleanest way to access `configuration.isPressed`
                 
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(title)
-                        .font(.system(size: 17, weight: .semibold))
-                        .foregroundColor(.white)
-                    Text(subtitle)
-                        .font(.system(size: 14))
-                        .foregroundColor(isPrimary ? .white.opacity(0.8) : .white.opacity(0.5))
-                }
-                
-                Spacer()
-                
-                Image(systemName: "chevron.right")
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundColor(isPrimary ? .white.opacity(0.7) : .white.opacity(0.4))
+                // Since we need to access isPressed for the whole row background AND internal elements
+                // It's easier to implement the content IN the ButtonStyle or use a style that wraps everything.
             }
-            .padding(AppConstants.cardPadding)
-            .background(
-                isPrimary 
-                    ? AnyShapeStyle(PremiumTheme.primaryGradient)
-                    : AnyShapeStyle(Color.white.opacity(0.08))
-            )
-            .cornerRadius(AppConstants.cardCornerRadius)
-            .overlay(
-                RoundedRectangle(cornerRadius: AppConstants.cardCornerRadius)
-                    .stroke(isPrimary ? Color.clear : Color.white.opacity(0.1), lineWidth: 1)
-            )
         }
+        .buttonStyle(AddFlightButtonStyle(icon: icon, title: title, subtitle: subtitle, isPrimary: isPrimary))
+    }
+}
+
+struct AddFlightButtonStyle: ButtonStyle {
+    let icon: String
+    let title: String
+    let subtitle: String
+    let isPrimary: Bool
+    
+    func makeBody(configuration: Configuration) -> some View {
+        let isPressed = configuration.isPressed
+        // Highlight if primary OR pressed
+        let showHighlight = isPrimary || isPressed
+        
+        return HStack(spacing: AppConstants.spacing) {
+            Image(systemName: icon)
+                .font(.system(size: 24))
+                .foregroundColor(showHighlight ? .white : PremiumTheme.electricBlue)
+                .frame(width: 50, height: 50)
+                .background(showHighlight ? Color.white.opacity(0.2) : PremiumTheme.electricBlue.opacity(0.15))
+                .cornerRadius(12)
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundColor(.white)
+                Text(subtitle)
+                    .font(.system(size: 14))
+                    .foregroundColor(showHighlight ? .white.opacity(0.8) : .white.opacity(0.5))
+            }
+            
+            Spacer()
+            
+            Image(systemName: "chevron.right")
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundColor(showHighlight ? .white.opacity(0.7) : .white.opacity(0.4))
+        }
+        .padding(AppConstants.cardPadding)
+        .background(
+            showHighlight
+            ? AnyShapeStyle(PremiumTheme.primaryGradient)
+            : AnyShapeStyle(Color.white.opacity(0.08))
+        )
+        .cornerRadius(AppConstants.cardCornerRadius)
+        .overlay(
+            RoundedRectangle(cornerRadius: AppConstants.cardCornerRadius)
+                .stroke(showHighlight ? Color.clear : Color.white.opacity(0.1), lineWidth: 1)
+        )
+        .scaleEffect(isPressed ? 0.98 : 1.0)
+        .animation(.easeInOut(duration: 0.1), value: isPressed)
     }
 }
 

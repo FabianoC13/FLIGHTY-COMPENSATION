@@ -24,11 +24,18 @@ struct ManualEntryView: View {
                 Form {
                     Section {
                         // Custom styled text field
-                        TextField("Flight Code (e.g., BA178)", text: $flightCode)
-                            .textInputAutocapitalization(.characters)
-                            .autocorrectionDisabled()
-                            .listRowBackground(Color.white.opacity(0.1))
-                            .foregroundStyle(.white)
+                        // Custom styled text field
+                        ZStack(alignment: .leading) {
+                            if flightCode.isEmpty {
+                                Text("Flight Code (e.g., BA178)")
+                                    .foregroundColor(.white.opacity(0.5))
+                            }
+                            TextField("", text: $flightCode)
+                                .textInputAutocapitalization(.characters)
+                                .autocorrectionDisabled()
+                                .foregroundStyle(.white)
+                        }
+                        .listRowBackground(Color.white.opacity(0.1))
                         
                         DatePicker("Date", selection: $selectedDate, displayedComponents: .date)
                             .listRowBackground(Color.white.opacity(0.1))
