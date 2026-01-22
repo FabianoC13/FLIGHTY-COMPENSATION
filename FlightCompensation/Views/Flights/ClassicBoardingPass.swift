@@ -266,7 +266,7 @@ struct ClassicBoardingPass: View {
         
         return Text(displayText)
             .font(.custom("HelveticaNeue-Bold", size: 9))
-            .foregroundStyle(statusColor)
+            .foregroundStyle(.white)
             .padding(.horizontal, 6)
             .padding(.vertical, 2)
             .background(Color.black.opacity(0.4))
