@@ -6,7 +6,6 @@ struct ManualEntryView: View {
     
     @State private var flightCode: String = ""
     @State private var selectedDate = Date()
-    @FocusState private var isFlightCodeFocused: Bool
     
     var body: some View {
         NavigationStack {
@@ -28,7 +27,6 @@ struct ManualEntryView: View {
                         TextField("Flight Code (e.g., BA178)", text: $flightCode)
                             .textInputAutocapitalization(.characters)
                             .autocorrectionDisabled()
-                            .focused($isFlightCodeFocused)
                             .listRowBackground(Color.white.opacity(0.1))
                             .foregroundStyle(.white)
                         
