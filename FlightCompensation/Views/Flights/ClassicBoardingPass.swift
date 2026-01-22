@@ -199,7 +199,7 @@ struct ClassicBoardingPass: View {
                 infoItem(label: "FLIGHT", value: flight.displayFlightNumber)
                 infoItem(label: "DATE", value: shortDate(flight.scheduledDeparture))
                 if let claimDate = flight.claimDate {
-                    infoItem(label: "CLAIMED", value: shortDate(claimDate))
+                    infoItem(label: "CLAIMED", value: shortDate(claimDate), valueColor: PremiumTheme.goldStart, isBold: true)
                 } else {
                     infoItem(label: "TIME", value: formatTime(flight.scheduledDeparture))
                 }
@@ -308,14 +308,14 @@ struct ClassicBoardingPass: View {
         }
     }
 
-    private func infoItem(label: String, value: String) -> some View {
+    private func infoItem(label: String, value: String, valueColor: Color = .white, isBold: Bool = false) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(label)
                 .font(.custom("HelveticaNeue-Medium", size: 8))
-                .foregroundStyle(.white.opacity(0.4))
+                .foregroundStyle(.white.opacity(0.6)) // Increased contrast (0.4 -> 0.6)
             Text(value)
-                .font(.custom("HelveticaNeue-Bold", size: 12))
-                .foregroundStyle(.white)
+                .font(.custom(isBold ? "HelveticaNeue-Bold" : "HelveticaNeue-Bold", size: 12)) // keeping bold base, but logic ready for weight change if needed
+                .foregroundStyle(valueColor)
         }
     }
     
