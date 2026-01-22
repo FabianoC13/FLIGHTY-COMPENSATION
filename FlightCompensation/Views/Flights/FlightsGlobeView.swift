@@ -69,7 +69,6 @@ struct FlightsGlobeView: View {
         }
         .mapStyle(currentMapStyle)
         .mapControlVisibility(.hidden)
-        .drawingGroup() // GPU accelerate the entire map view for smoother animations
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 updateCameraToFitRoutes()
