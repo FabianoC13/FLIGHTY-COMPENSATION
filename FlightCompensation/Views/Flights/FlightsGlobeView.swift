@@ -21,7 +21,8 @@ struct FlightsGlobeView: View {
     )
     
     private var currentMapStyle: MapStyle {
-        isSatelliteView ? .hybrid(elevation: .realistic) : .standard(elevation: .realistic, pointsOfInterest: .including([.airport]))
+        // Use flat elevation instead of realistic for better performance during drag
+        isSatelliteView ? .hybrid(elevation: .flat) : .standard(elevation: .flat, pointsOfInterest: .including([.airport]))
     }
 
     
@@ -68,6 +69,7 @@ struct FlightsGlobeView: View {
         }
         .mapStyle(currentMapStyle)
         .mapControlVisibility(.hidden)
+        .drawingGroup() // GPU accelerate the entire map view for smoother animations
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 updateCameraToFitRoutes()
