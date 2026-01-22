@@ -69,6 +69,7 @@ struct FlightsGlobeView: View {
         }
         .mapStyle(currentMapStyle)
         .mapControlVisibility(.hidden)
+        .colorScheme(.dark) // Force dark map tiles for Standard style
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 updateCameraToFitRoutes()
