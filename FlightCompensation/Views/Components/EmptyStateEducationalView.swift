@@ -72,7 +72,7 @@ struct EmptyStateEducationalView: View {
             
             // Call to Action Button
             GradientButton(
-                title: "Add Flight",
+                title: "Start Claim",
                 icon: "plus",
                 gradient: PremiumTheme.primaryGradient,
                 action: onAddFlight
