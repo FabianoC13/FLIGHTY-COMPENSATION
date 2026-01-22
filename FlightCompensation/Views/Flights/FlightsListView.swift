@@ -6,6 +6,7 @@ struct FlightsListView: View {
     @State private var showAddFlight = false
     @State private var showSettings = false
     @State private var selectedFlight: Flight?
+    @State private var navigatingToClaimFlight: Flight?
     
     // Map style toggle
     @State private var isSatelliteMap: Bool = true
@@ -97,12 +98,26 @@ struct FlightsListView: View {
                         onFlightAdded: { flight in
                             viewModel.addFlight(flight)
                             showAddFlight = false
+                            
+                            // Slight delay to allow sheet to dismiss before navigating push
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                navigatingToClaimFlight = flight
+                            }
                         }
                     )
                 )
             }
             .navigationDestination(item: $selectedFlight) { flight in
                 FlightDetailView(viewModel: makeDetailViewModel(for: flight))
+            }
+            .navigationDestination(item: $navigatingToClaimFlight) { flight in
+                ClaimFlowView(flight: flight, onClaimSuccess: { reference, status in
+                    // On success, we might want to refresh flight status or show a success message
+                    // For now, we just return to the list (which this callback allows by dismissing)
+                    Task {
+                        await refreshFlights()
+                    }
+                })
             }
             .alert("Error", isPresented: Binding(
                 get: { viewModel.errorMessage != nil },
