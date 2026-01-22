@@ -86,6 +86,11 @@ final class FlightsListViewModel: ObservableObject {
         Task {
             do {
                 // First, get complete flight details (airports, times, etc.)
+                // Capture local claim data before overwriting with API result
+                let existingClaimStatus = flight.claimStatus
+                let existingClaimReference = flight.claimReference
+                let existingClaimDate = flight.claimDate
+                
                 var updatedFlight = flight
                 print("➡️ [List] Starting tracking for: \(flight.displayFlightNumber) — route: \(flight.route), currentStatus: \(flight.currentStatus.displayName)")
                 if let flightWithDetails = try? await flightTrackingService.getFlightDetails(flight) {
@@ -141,9 +146,9 @@ final class FlightsListViewModel: ObservableObject {
                     status: updatedFlight.status,
                     currentStatus: status,
                     delayEvents: delayEvents,
-                    claimStatus: updatedFlight.claimStatus,
-                    claimReference: updatedFlight.claimReference,
-                    claimDate: updatedFlight.claimDate
+                    claimStatus: existingClaimStatus,
+                    claimReference: existingClaimReference,
+                    claimDate: existingClaimDate
                 )
                 
                 // Update flight in the list with all new data
