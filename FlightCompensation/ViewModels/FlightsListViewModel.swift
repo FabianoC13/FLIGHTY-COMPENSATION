@@ -64,8 +64,18 @@ final class FlightsListViewModel: ObservableObject {
     }
     
     func deleteFlight(_ flight: Flight) {
+        // Optimistic UI update
         flights.removeAll { $0.id == flight.id }
-        flightStorageService.save(flights: flights)
+        
+        Task {
+            do {
+                try await flightStorageService.moveToHistory(flight: flight)
+            } catch {
+                print("❌ Failed to move flight to history: \(error.localizedDescription)")
+                // Revert UI on failure
+                loadFlights()
+            }
+        }
     }
     
     func refreshFlightStatus(_ flight: Flight) {

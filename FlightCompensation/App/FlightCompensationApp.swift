@@ -15,23 +15,38 @@ struct FlightCompensationApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject private var dependencies = AppDependencies()
     @StateObject private var userProfileService = UserProfileService.shared
+    @State private var isShowingSplash = true
     
     var body: some Scene {
         WindowGroup {
-            Group {
-                if userProfileService.hasOnboarded {
-                    FlightsListView(
-                        viewModel: FlightsListViewModel(
-                            flightTrackingService: dependencies.flightTrackingService,
-                            flightStorageService: dependencies.flightStorageService
-                        ),
-                        authService: dependencies.authenticationService
-                    )
+            ZStack {
+                if isShowingSplash {
+                    SplashScreenView()
+                        .transition(.opacity)
                 } else {
-                    WelcomeCarouselView()
+                    Group {
+                        if userProfileService.hasOnboarded {
+                            FlightsListView(
+                                viewModel: FlightsListViewModel(
+                                    flightTrackingService: dependencies.flightTrackingService,
+                                    flightStorageService: dependencies.flightStorageService
+                                ),
+                                authService: dependencies.authenticationService
+                            )
+                        } else {
+                            WelcomeCarouselView()
+                        }
+                    }
+                    .transition(.opacity)
                 }
             }
             .onAppear {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                    withAnimation {
+                        isShowingSplash = false
+                    }
+                }
+                
                 NotificationManager.shared.requestAuthorization { granted in
                     print("Notifications authorized: \(granted)")
                 }

@@ -4,7 +4,6 @@ import PhotosUI
 struct DocumentUploadView: View {
     @ObservedObject var viewModel: ClaimViewModel
     
-    @State private var selectedBoardingPassItem: PhotosPickerItem?
     @State private var selectedIdentityItem: PhotosPickerItem?
     
     var body: some View {
@@ -15,21 +14,6 @@ struct DocumentUploadView: View {
                 .multilineTextAlignment(.center)
                 .padding()
             
-            // Boarding Pass
-            DocumentPickerRow(
-                title: "Boarding Pass",
-                icon: "ticket",
-                hasData: viewModel.claimRequest.evidence.boardingPassImage != nil,
-                selection: $selectedBoardingPassItem
-            )
-            .onChange(of: selectedBoardingPassItem) { _, newItem in
-                Task {
-                    if let data = try? await newItem?.loadTransferable(type: Data.self) {
-                        viewModel.claimRequest.evidence.boardingPassImage = data
-                        viewModel.validateCurrentStep()
-                    }
-                }
-            }
             
             // Identity Document
             DocumentPickerRow(

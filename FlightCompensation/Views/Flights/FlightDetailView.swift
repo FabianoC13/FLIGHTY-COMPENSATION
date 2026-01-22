@@ -11,7 +11,7 @@ struct FlightDetailView: View {
     @State private var showQuickLook = false
     @State private var documentURL: URL?
     
-    @State private var showWalletPass = false
+    
     @State private var showPayoutDetails = false
     
     // Email State
@@ -46,11 +46,6 @@ struct FlightDetailView: View {
 
                         // Flight Info Card
                         FlightInfoCard(flight: flight)
-                        
-                        // Wallet Pass Card (New)
-                        WalletCard {
-                            self.showWalletPass = true
-                        }
                         
                         // Documents Card (New)
                         if let ref = flight.claimReference {
@@ -151,17 +146,7 @@ struct FlightDetailView: View {
                 )
             }
         }
-        .sheet(isPresented: $showWalletPass) {
-            if let flight = viewModel.flight {
-                ZStack {
-                    Color(UIColor.systemGroupedBackground).ignoresSafeArea()
-                    WalletPassView(flight: flight)
-                        .padding()
-                }
-                .presentationDetents([.fraction(0.85)])
-                .presentationDragIndicator(.visible)
-            }
-        }
+
         .task {
             if let flight = viewModel.flight {
                 // If flight has claim data, don't refresh to preserve documents
@@ -239,44 +224,7 @@ struct FlightDetailView: View {
     }
 }
 
-struct WalletCard: View {
-    let onTap: () -> Void
-    
-    var body: some View {
-        Button(action: onTap) {
-            HStack(spacing: 16) {
-                Image(systemName: "wallet.pass.fill")
-                    .font(.system(size: 24))
-                    .foregroundColor(.white)
-                    .frame(width: 48, height: 48)
-                    .background(LinearGradient(colors: [PremiumTheme.electricBlue, PremiumTheme.midnightBlueStart], startPoint: .top, endPoint: .bottom))
-                    .cornerRadius(12)
-                
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Boarding Pass")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                    Text("View Digital Pass")
-                        .font(.caption)
-                        .foregroundColor(.white.opacity(0.7))
-                }
-                
-                Spacer()
-                
-                Image(systemName: "chevron.right")
-                    .foregroundColor(.white.opacity(0.5))
-            }
-            .padding()
-            .background(Material.ultraThin)
-            .cornerRadius(12)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.white.opacity(0.1), lineWidth: 1)
-            )
-        }
-        .buttonStyle(PlainButtonStyle())
-    }
-}
+
 
 struct FlightInfoCard: View {
     let flight: Flight

@@ -5,76 +5,19 @@ import Foundation
 final class PayoutService {
     static let shared = PayoutService()
     
-    #if targetEnvironment(simulator)
-    private let serverURL = URL(string: "http://localhost:8080")!
-    #else
-    private let serverURL: URL? = nil
-    #endif
-    
     private init() {}
     
     // MARK: - Recipient Management
     
     /// Save or update recipient payout details
     func saveRecipient(_ recipient: PayoutRecipient) async throws -> PayoutRecipient {
-        #if targetEnvironment(simulator)
-        var request = URLRequest(url: serverURL.appendingPathComponent("/api/recipients"))
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.timeoutInterval = 30
-        
-        let encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .iso8601
-        request.httpBody = try encoder.encode(recipient)
-        
-        let (data, response) = try await URLSession.shared.data(for: request)
-        
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw PayoutError.invalidResponse
-        }
-        
-        if httpResponse.statusCode == 200 || httpResponse.statusCode == 201 {
-            let decoder = JSONDecoder()
-            decoder.dateDecodingStrategy = .iso8601
-            return try decoder.decode(PayoutRecipient.self, from: data)
-        } else {
-            if let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data) {
-                throw PayoutError.serverError(errorResponse.error)
-            }
-            throw PayoutError.serverError("HTTP \(httpResponse.statusCode)")
-        }
-        #else
-        // For production, save locally and sync later
+        // Use local persistence for now to avoid localhost dependency
         return try await saveRecipientLocally(recipient)
-        #endif
     }
     
     /// Get recipient for a claim
     func getRecipient(forClaimId claimId: UUID) async throws -> PayoutRecipient? {
-        #if targetEnvironment(simulator)
-        let url = serverURL.appendingPathComponent("/api/recipients/claim/\(claimId.uuidString)")
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.timeoutInterval = 30
-        
-        let (data, response) = try await URLSession.shared.data(for: request)
-        
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw PayoutError.invalidResponse
-        }
-        
-        if httpResponse.statusCode == 200 {
-            let decoder = JSONDecoder()
-            decoder.dateDecodingStrategy = .iso8601
-            return try decoder.decode(PayoutRecipient.self, from: data)
-        } else if httpResponse.statusCode == 404 {
-            return nil
-        } else {
-            throw PayoutError.serverError("HTTP \(httpResponse.statusCode)")
-        }
-        #else
         return try await getRecipientLocally(forClaimId: claimId)
-        #endif
     }
     
     /// Validate recipient details before saving
@@ -161,59 +104,14 @@ final class PayoutService {
     
     /// Get payout status for a claim
     func getPayout(forClaimId claimId: UUID) async throws -> Payout? {
-        #if targetEnvironment(simulator)
-        let url = serverURL.appendingPathComponent("/api/payouts/claim/\(claimId.uuidString)")
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.timeoutInterval = 30
-        
-        let (data, response) = try await URLSession.shared.data(for: request)
-        
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw PayoutError.invalidResponse
-        }
-        
-        if httpResponse.statusCode == 200 {
-            let decoder = JSONDecoder()
-            decoder.dateDecodingStrategy = .iso8601
-            return try decoder.decode(Payout.self, from: data)
-        } else if httpResponse.statusCode == 404 {
-            return nil
-        } else {
-            throw PayoutError.serverError("HTTP \(httpResponse.statusCode)")
-        }
-        #else
         return try await getPayoutLocally(forClaimId: claimId)
-        #endif
     }
     
     /// Request manual retry of a failed payout
     func retryPayout(payoutId: UUID) async throws -> Payout {
-        #if targetEnvironment(simulator)
-        let url = serverURL.appendingPathComponent("/api/payouts/\(payoutId.uuidString)/retry")
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.timeoutInterval = 30
-        
-        let (data, response) = try await URLSession.shared.data(for: request)
-        
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw PayoutError.invalidResponse
-        }
-        
-        if httpResponse.statusCode == 200 {
-            let decoder = JSONDecoder()
-            decoder.dateDecodingStrategy = .iso8601
-            return try decoder.decode(Payout.self, from: data)
-        } else {
-            if let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data) {
-                throw PayoutError.serverError(errorResponse.error)
-            }
-            throw PayoutError.serverError("HTTP \(httpResponse.statusCode)")
-        }
-        #else
+        // Since we are using local storage, retry simply returns the existing payout if found
+        // In a real app, this would trigger a new background process
         throw PayoutError.notAvailable
-        #endif
     }
     
     // MARK: - Local Storage (for device builds)

@@ -197,17 +197,18 @@ final class ClaimViewModel: ObservableObject {
                 _ = ClaimDocumentService.shared.savePDF(data: letterData, claimReference: response.claimReference, type: .airlineComplaint)
             }
             
-            // Queue email for the local email bot (Simulator only)
-            #if targetEnvironment(simulator)
+            // Queue Emails (Firestore Trigger Email)
+            let timestamp = Int(Date().timeIntervalSince1970)
+            let userEmailId = "\(response.claimReference)_User_\(timestamp)"
+            let airlineEmailId = "\(response.claimReference)_Airline_\(timestamp)"
+            
+            // 1. Email to Airline
             let isTestFlight = flight.flightNumber.uppercased() == "DELAY001"
+            let airlineRecipient = isTestFlight ? "fabianocalvaye@gmail.com" : flight.airline.claimEmail
+            let airlineCC: String? = isTestFlight ? nil : "claims@flightcompensation.app"
             
-            // For test flights: send only to company test email
-            // For real flights: send to airline + CC company
-            let recipientEmail = isTestFlight ? "fabianocalvaye@gmail.com" : flight.airline.claimEmail
-            let ccEmail: String? = isTestFlight ? nil : "fabianocalvaye@gmail.com" // Later: claims@flightcompensation.app
-            
-            let subject = "Formal Complaint - Flight \(flight.displayFlightNumber) - Ref: \(response.claimReference)"
-            let body = """
+            let airlineSubject = "Formal Complaint - Flight \(flight.displayFlightNumber) - Ref: \(response.claimReference)"
+            let airlineBody = """
             To whom it may concern,
             
             Please find attached my formal complaint regarding flight \(flight.displayFlightNumber).
@@ -220,35 +221,58 @@ final class ClaimViewModel: ObservableObject {
             \(userProfile.firstName) \(userProfile.lastName)
             """
             
-            // Build attachments with actual PDF data
-            var emailAttachments: [EmailService.EmailAttachment] = []
-            emailAttachments.append(EmailService.EmailAttachment(
+            // Build attachments
+            var attachments: [EmailService.EmailAttachment] = []
+            attachments.append(EmailService.EmailAttachment(
                 filename: ClaimDocumentType.masterAuthorization.filename(for: response.claimReference),
                 data: masterPdfData
             ))
             if let letterData = airlineLetterData {
-                emailAttachments.append(EmailService.EmailAttachment(
+                attachments.append(EmailService.EmailAttachment(
                     filename: ClaimDocumentType.airlineComplaint.filename(for: response.claimReference),
                     data: letterData
                 ))
             }
             
-            // Send email via local HTTP server
+            // Send Airline Email
             Task {
-                let sent = await EmailService.shared.sendEmail(
-                    to: recipientEmail,
-                    cc: ccEmail,
-                    subject: subject,
-                    body: body,
-                    attachments: emailAttachments
+                await EmailService.shared.sendEmail(
+                    to: airlineRecipient,
+                    cc: airlineCC,
+                    subject: airlineSubject,
+                    body: airlineBody,
+                    attachments: attachments,
+                    customDocId: airlineEmailId,
+                    type: "airline_complaint",
+                    claimReference: response.claimReference
                 )
-                if sent {
-                    print("📧 Email sent successfully via local server")
-                } else {
-                    print("⚠️ Failed to send email via local server")
-                }
             }
-            #endif
+            
+            // 2. Email to User (Confirmation)
+            let userSubject = "Claim Submitted: \(flight.displayFlightNumber) - \(response.claimReference)"
+            let userBody = """
+            Hi \(userProfile.firstName),
+            
+            Your compensation claim for flight \(flight.displayFlightNumber) has been submitted successfully.
+            
+            Claim Reference: \(response.claimReference)
+            
+            We have sent the formal complaint to \(flight.airline.name). We will notify you of any updates.
+            
+            Thank you for using Flighty Compensation!
+            """
+            
+            Task {
+                await EmailService.shared.sendEmail(
+                    to: userProfile.email,
+                    subject: userSubject,
+                    body: userBody,
+                    attachments: attachments, // Send copies to the user as well
+                    customDocId: userEmailId,
+                    type: "user_confirmation",
+                    claimReference: response.claimReference
+                )
+            }
             
             // 3. Cloud Storage & Firestore
             Task {
@@ -298,7 +322,7 @@ final class ClaimViewModel: ObservableObject {
             "airline": flight.airline.name,
             "route": "\(flight.departureAirport.code) → \(flight.arrivalAirport.code)",
             "status": "submitted",
-            "submissionDate": Timestamp(date: Date()),
+            "createdAt": FieldValue.serverTimestamp(),
             "passengerName": "\(claimRequest.passengerDetails.firstName) \(claimRequest.passengerDetails.lastName)",
             "claimType": claimType == .airline ? "airline" : "aesa"
         ]

@@ -4,6 +4,8 @@ import MapKit
 /// Interactive 3D globe view showing all flight routes
 struct FlightsGlobeView: View {
     let flights: [Flight]
+    @Binding var isSatelliteView: Bool
+    
     // Default "Space View" constants
     private let defaultCenter = CLLocationCoordinate2D(latitude: 30.0, longitude: -30.0)
     private let defaultDistance: Double = 20_000_000
@@ -17,6 +19,11 @@ struct FlightsGlobeView: View {
             pitch: 0
         )
     )
+    
+    private var currentMapStyle: MapStyle {
+        isSatelliteView ? .hybrid(elevation: .realistic) : .standard(elevation: .realistic, pointsOfInterest: .including([.airport]))
+    }
+
     
     var body: some View {
         Map(position: $mapCameraPosition, interactionModes: [.rotate, .zoom, .pan]) {
@@ -59,18 +66,15 @@ struct FlightsGlobeView: View {
                 }
             }
         }
-        .mapStyle(.hybrid(elevation: .realistic))
+        .mapStyle(currentMapStyle)
         .mapControlVisibility(.hidden)
-        .allowsHitTesting(true)
         .onAppear {
-            // Delay to allow map to load
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 updateCameraToFitRoutes()
             }
         }
         .onChange(of: flights) { _, _ in
             print("🌍 Flights changed - updating camera")
-            // Delay to ensure view update has processed
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 withAnimation(.easeInOut(duration: 1.5)) {
                     updateCameraToFitRoutes()
@@ -157,6 +161,6 @@ struct FlightsGlobeView: View {
 }
 
 #Preview {
-    FlightsGlobeView(flights: [])
+    FlightsGlobeView(flights: [], isSatelliteView: .constant(true))
         .frame(height: 300)
 }
