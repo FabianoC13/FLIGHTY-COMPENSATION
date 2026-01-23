@@ -47,6 +47,15 @@ struct FlightDetailView: View {
                         // Flight Info Card
                         FlightInfoCard(flight: flight)
                         
+                        // Claim Status Card (New)
+                        if flight.claimStatus != .notStarted {
+                            ClaimStatusCard(
+                                claimStatus: flight.claimStatus,
+                                claimDate: flight.claimDate,
+                                claimReference: flight.claimReference
+                            )
+                        }
+                        
                         // Documents Card (New)
                         if let ref = flight.claimReference {
                             let masterUrl = ClaimDocumentService.shared.getPDFURL(for: ref, type: .masterAuthorization)
@@ -82,18 +91,6 @@ struct FlightDetailView: View {
                             )
                         }
                         
-                        // Live Status Card
-                        LiveStatusCard(
-                            flight: flight,
-                            isLoading: viewModel.isLoading,
-                            onRefresh: { viewModel.trackFlight() }
-                        )
-                        
-                        // Delay Info (if delayed)
-                        if flight.hasActiveDelay, let delayEvent = flight.latestDelayEvent {
-                            DelayInfoCard(delayEvent: delayEvent)
-                        }
-
                         // Timeline (show all delay/cancel events)
                         FlightTimelineView(events: viewModel.timelineEvents)
 
@@ -462,6 +459,115 @@ struct CheckingEligibilityCard: View {
             RoundedRectangle(cornerRadius: AppConstants.cardCornerRadius)
                 .stroke(Color.white.opacity(0.1), lineWidth: 1)
         )
+    }
+}
+
+// MARK: - Claim Status Card
+
+struct ClaimStatusCard: View {
+    let claimStatus: ClaimStatus
+    let claimDate: Date?
+    let claimReference: String?
+    
+    private let allStatuses: [ClaimStatus] = [
+        .airlineClaimSubmitted,
+        .airlineRejected,
+        .aesaSubmitted,
+        .approved,
+        .paid
+    ]
+    
+    private var currentIndex: Int {
+        allStatuses.firstIndex(of: claimStatus) ?? 0
+    }
+    
+    private var statusColor: Color {
+        Color(hex: claimStatus.colorHex)
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: AppConstants.spacing) {
+            // Header
+            HStack {
+                Text("Claim Status")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(.white)
+                Spacer()
+                Text(claimStatus.rawValue.uppercased())
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(statusColor)
+                    .cornerRadius(6)
+            }
+            
+            // Progress Indicator
+            HStack(spacing: 4) {
+                ForEach(0..<allStatuses.count, id: \.self) { index in
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(index <= currentIndex ? statusColor : Color.white.opacity(0.2))
+                        .frame(height: 4)
+                }
+            }
+            .padding(.vertical, 4)
+            
+            Divider().background(Color.white.opacity(0.2))
+            
+            // Details Grid
+            VStack(spacing: 12) {
+                if let date = claimDate {
+                    DetailRow(label: "Claim Filed", value: date.formatted(date: .abbreviated, time: .omitted))
+                }
+                
+                if let ref = claimReference {
+                    DetailRow(label: "Reference", value: String(ref.prefix(8)).uppercased())
+                }
+                
+                DetailRow(label: "Next Step", value: nextStepText)
+            }
+        }
+        .padding(AppConstants.cardPadding)
+        .background(Material.ultraThin)
+        .cornerRadius(AppConstants.cardCornerRadius)
+        .overlay(
+            RoundedRectangle(cornerRadius: AppConstants.cardCornerRadius)
+                .stroke(Color.white.opacity(0.1), lineWidth: 1)
+        )
+    }
+    
+    private var nextStepText: String {
+        switch claimStatus {
+        case .notStarted:
+            return "File a claim"
+        case .airlineClaimSubmitted:
+            return "Awaiting airline response (8 weeks)"
+        case .airlineRejected:
+            return "Escalate to AESA"
+        case .aesaSubmitted:
+            return "Awaiting AESA decision"
+        case .approved:
+            return "Set up payment method"
+        case .paid:
+            return "Claim completed"
+        }
+    }
+}
+
+private struct DetailRow: View {
+    let label: String
+    let value: String
+    
+    var body: some View {
+        HStack {
+            Text(label)
+                .font(.system(size: 14))
+                .foregroundColor(.white.opacity(0.6))
+            Spacer()
+            Text(value)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(.white)
+        }
     }
 }
 

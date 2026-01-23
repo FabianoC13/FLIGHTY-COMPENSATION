@@ -208,10 +208,11 @@ struct ClassicBoardingPass: View {
             .padding(.bottom, 12)
         }
         .frame(maxWidth: .infinity)
+        .background(Color.black.opacity(0.6)) // Midnight Tint
         .background(Material.ultraThin) // Glassmorphism
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .clipShape(TicketShape(side: .left, cornerRadius: 12, cutoutRadius: 8))
         .overlay(
-            RoundedRectangle(cornerRadius: 12)
+            TicketShape(side: .left, cornerRadius: 12, cutoutRadius: 8)
                 .stroke(Color.white.opacity(0.1), lineWidth: 1)
         )
     }
@@ -237,27 +238,110 @@ struct ClassicBoardingPass: View {
         }
         .padding(10)
         .frame(width: 70)
+        .background(Color.black.opacity(0.6)) // Midnight Glass
         .background(Material.ultraThin) // Glassmorphism for stub too
         .overlay(Color.black.opacity(0.2)) // Slightly darker for stub
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .clipShape(TicketShape(side: .right, cornerRadius: 12, cutoutRadius: 8))
         .overlay(
-            RoundedRectangle(cornerRadius: 12)
+            TicketShape(side: .right, cornerRadius: 12, cutoutRadius: 8)
                 .stroke(Color.white.opacity(0.1), lineWidth: 1)
         )
     }
     
     // MARK: - Perforated Divider
     private var perforatedDivider: some View {
-        VStack(spacing: 4) {
-             ForEach(0..<12, id: \.self) { _ in
-                 Circle()
-                     .fill(Color.white.opacity(0.3))
-                     .frame(width: 4, height: 4)
-             }
-        }
-        .padding(.vertical, 4)
-        .background(Color.clear)
+        Color.clear
+            .frame(width: 4) // Tighter gap
+            .overlay(
+                Line()
+                    // lineWidth 4 matches gap
+                    // dash [0, 8] = 4px dot + 4px space (classic perforation)
+                    .stroke(style: StrokeStyle(lineWidth: 4, lineCap: .round, dash: [0, 8]))
+                    .foregroundStyle(.white.opacity(0.3))
+                    .padding(.vertical, 8) // Reduced padding to 8 to touch the cutout start
+            )
     }
+
+    struct Line: Shape {
+        func path(in rect: CGRect) -> Path {
+            var path = Path()
+            // Fix alignment: Draw down the CENTER of the frame, not the left edge
+            path.move(to: CGPoint(x: rect.midX, y: 0))
+            path.addLine(to: CGPoint(x: rect.midX, y: rect.height))
+            return path
+        }
+    }
+    
+    // Custom shape for the ticket "bite" effect
+    struct TicketShape: Shape {
+        let side: Side
+        let cornerRadius: CGFloat
+        let cutoutRadius: CGFloat
+        
+        enum Side {
+            case left, right
+        }
+        
+        func path(in rect: CGRect) -> Path {
+            var path = Path()
+            
+            if side == .left {
+                // Top Left (Rounded) - Use Tangent Arc for perfect curve
+                path.move(to: CGPoint(x: 0, y: cornerRadius))
+                path.addArc(tangent1End: CGPoint(x: 0, y: 0), tangent2End: CGPoint(x: cornerRadius, y: 0), radius: cornerRadius)
+                
+                // Top Edge to Cutout
+                path.addLine(to: CGPoint(x: rect.width - cutoutRadius, y: 0))
+                
+                // Top Right Bite (Concave) - 180 -> 90 (Decreasing/CCW)
+                path.addArc(center: CGPoint(x: rect.width, y: 0), radius: cutoutRadius, startAngle: .degrees(180), endAngle: .degrees(90), clockwise: true)
+                
+                // Right Edge
+                path.addLine(to: CGPoint(x: rect.width, y: rect.height - cutoutRadius))
+                
+                // Bottom Right Bite (Concave) - 270 -> 180 (Decreasing/CCW)
+                path.addArc(center: CGPoint(x: rect.width, y: rect.height), radius: cutoutRadius, startAngle: .degrees(270), endAngle: .degrees(180), clockwise: true)
+                
+                // Bottom Edge to Corner
+                path.addLine(to: CGPoint(x: cornerRadius, y: rect.height))
+                
+                // Bottom Left (Rounded) - Tangent Arc
+                path.addArc(tangent1End: CGPoint(x: 0, y: rect.height), tangent2End: CGPoint(x: 0, y: rect.height - cornerRadius), radius: cornerRadius)
+                path.closeSubpath()
+                
+            } else {
+                // Right Stub
+                // Top Right (Rounded) - Tangent Arc
+                path.move(to: CGPoint(x: rect.width - cornerRadius, y: 0))
+                path.addLine(to: CGPoint(x: cutoutRadius, y: 0))
+                
+                // Top Left Bite (Concave) - 360/0 -> 90 (Increasing/CW) -> Wait, 0->90 is increasing. But we want 0->90 to carve IN.
+                // Center (0,0). Start 0(Right). End 90(Down).
+                // 0->90 is "into" the rect. Correct.
+                path.addArc(center: CGPoint(x: 0, y: 0), radius: cutoutRadius, startAngle: .degrees(0), endAngle: .degrees(90), clockwise: false)
+                
+                // Left Edge
+                path.addLine(to: CGPoint(x: 0, y: rect.height - cutoutRadius))
+                
+                // Bottom Left Bite (Concave) - 270 -> 360/0 (Increasing/CW)
+                // Center (0, h). Start 270(Up). End 360(Right).
+                path.addArc(center: CGPoint(x: 0, y: rect.height), radius: cutoutRadius, startAngle: .degrees(270), endAngle: .degrees(360), clockwise: false)
+                
+                // Bottom Edge
+                path.addLine(to: CGPoint(x: rect.width - cornerRadius, y: rect.height))
+                
+                // Bottom Right (Rounded) - Tangent Arc
+                path.addArc(tangent1End: CGPoint(x: rect.width, y: rect.height), tangent2End: CGPoint(x: rect.width, y: rect.height - cornerRadius), radius: cornerRadius)
+                
+                // Top Right (Rounded) - Tangent Arc - Closing loop
+                path.addArc(tangent1End: CGPoint(x: rect.width, y: 0), tangent2End: CGPoint(x: rect.width - cornerRadius, y: 0), radius: cornerRadius)
+                path.closeSubpath()
+            }
+            
+            return path
+        }
+    }
+
     
     // MARK: - Helper Views
     private var statusBadge: some View {
