@@ -5,6 +5,7 @@
 | What | Where | Used for |
 |---|---|---|
 | FlightRadar24 API key (`id|secret`) | `Config/Secrets.xcconfig` → `FLIGHT_RADAR24_API_KEY` | Live flight status and measured arrival delays |
+| FlightRadar24 sandbox flag | `Config/Secrets.xcconfig` → `FLIGHT_RADAR24_SANDBOX = YES` | Only when using a sandbox key; it is no longer guessed from the key |
 | Company legal name, tax ID, address, email | `Config/Secrets.xcconfig` → `COMPANY_*` | Named in every document passengers sign. Release builds refuse to submit claims until set |
 | Client-money IBAN / BIC | `COLLECTION_IBAN`, `COLLECTION_BIC` | Printed in the airline letter as the payment account |
 | Terms and privacy URLs | `TERMS_URL`, `PRIVACY_URL` | Linked from the agreement |

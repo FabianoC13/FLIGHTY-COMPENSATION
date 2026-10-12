@@ -21,8 +21,12 @@ struct RepresentationSignatureView: View {
                     if canvasView.drawing.strokes.isEmpty {
                         viewModel.clearSignature()
                     } else {
-                        // 3x scale for a crisp signature in the PDF
-                        viewModel.saveSignature(canvasView.drawing.image(from: canvasView.bounds, scale: 3.0))
+                        // Render in light mode so the ink stays black on the white PDF; 3x for a crisp signature
+                        var image = UIImage()
+                        UITraitCollection(userInterfaceStyle: .light).performAsCurrent {
+                            image = canvasView.drawing.image(from: canvasView.bounds, scale: 3.0)
+                        }
+                        viewModel.saveSignature(image)
                     }
                 })
                 .frame(height: 200)
@@ -59,5 +63,9 @@ struct RepresentationSignatureView: View {
             Spacer()
         }
         .padding()
+        .onAppear {
+            // The canvas is recreated when coming back to this step; ask for a fresh signature
+            if canvasView.drawing.strokes.isEmpty { viewModel.clearSignature() }
+        }
     }
 }

@@ -142,7 +142,7 @@ final class ClaimViewModel: ObservableObject {
         case .passengerDetails:
             canMoveToNext = claimRequest.passengerDetails.isValid
         case .disruptionDetails:
-            canMoveToNext = disruptionQuestionsAnswered && eligibility.isEligible && eligibility.needsMoreInformation != true
+            canMoveToNext = disruptionQuestionsAnswered && eligibility.isEligible
         case .claimTypeSelection:
             canMoveToNext = claimType != nil
         case .evidenceUpload:
@@ -308,10 +308,17 @@ final class ClaimViewModel: ObservableObject {
             : nil
 
         let reference = pendingReference
-        var files = [ClaimSubmission.File(key: "authorization", fileName: ClaimDocumentType.masterAuthorization.filename(for: reference),
+        // Uploaded files can't be overwritten (storage.rules), so each attempt gets its own names
+        // and a retry after a partial failure doesn't collide with what was already uploaded.
+        let attempt = Int(Date().timeIntervalSince1970)
+        func uploadName(_ fileName: String) -> String {
+            let url = URL(fileURLWithPath: fileName)
+            return "\(url.deletingPathExtension().lastPathComponent)_\(attempt).\(url.pathExtension)"
+        }
+        var files = [ClaimSubmission.File(key: "authorization", fileName: uploadName(ClaimDocumentType.masterAuthorization.filename(for: reference)),
                                           contentType: "application/pdf", data: authorizationPDF)]
         if let letterPDF {
-            files.append(.init(key: "airlineLetter", fileName: ClaimDocumentType.airlineComplaint.filename(for: reference),
+            files.append(.init(key: "airlineLetter", fileName: uploadName(ClaimDocumentType.airlineComplaint.filename(for: reference)),
                                contentType: "application/pdf", data: letterPDF))
         }
         let evidence = claimRequest.evidence
@@ -319,7 +326,7 @@ final class ClaimViewModel: ObservableObject {
                              ("boardingPass", evidence.boardingPassImage),
                              ("bookingConfirmation", evidence.bookingConfirmationImage)] {
             if let jpeg = image.flatMap(Self.normalizedJPEG) {
-                files.append(.init(key: key, fileName: "\(key)_\(reference).jpg", contentType: "image/jpeg", data: jpeg))
+                files.append(.init(key: key, fileName: "\(key)_\(reference)_\(attempt).jpg", contentType: "image/jpeg", data: jpeg))
             }
         }
 
