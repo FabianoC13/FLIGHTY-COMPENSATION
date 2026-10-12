@@ -1,0 +1,42 @@
+# macOS / Finder
+.DS_Store
+* 2.*
+* 3.*
+
+# Xcode
+xcuserdata/
+DerivedData/
+build/
+*.xcuserstate
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Build logs
+*.log
+
+# Node / Firebase
+node_modules/
+.firebase/
+firebase-debug.log*
+firestore-debug.log*
+ui-debug.log*
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.db
+*.sqlite3
+
+# Secrets / local config
+.env
+.env.*
+!.env.example
+*.p8
+*.p12
+*.mobileprovision
+
+# SwiftPM
+.build/
+.swiftpm/

@@ -2,10 +2,10 @@
     "name": "functions",
     "description": "Cloud Functions for Flight Compensation App",
     "scripts": {
+        "test": "node --test test/*.test.js",
+        "test:rules": "firebase emulators:exec --only firestore,storage --project demo-flighty \"node --test rules-test/*.test.js\"",
         "serve": "firebase emulators:start --only functions",
-        "shell": "firebase functions:shell",
-        "start": "npm run shell",
-        "deploy": "firebase deploy --only functions",
+        "deploy": "firebase deploy --only functions,firestore:rules,storage",
         "logs": "firebase functions:log"
     },
     "engines": {
@@ -13,9 +13,13 @@
     },
     "main": "index.js",
     "dependencies": {
-        "firebase-admin": "^11.8.0",
-        "firebase-functions": "^4.4.0",
-        "nodemailer": "^6.9.4"
+        "firebase-admin": "^12.7.0",
+        "firebase-functions": "^6.1.0"
+    },
+    "devDependencies": {
+        "@firebase/rules-unit-testing": "^4.0.1",
+        "firebase": "^11.0.2",
+        "firebase-tools": "^13.24.0"
     },
     "private": true
 }

@@ -1,8 +1,54 @@
 rules_version = '2';
+
+// Default deny. Every path a client may touch is listed explicitly.
+// Server code (Cloud Functions, admin scripts) uses the Admin SDK and bypasses these rules.
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    // Per-user data: profile, tracked flights, history. Only the owner can read or write it.
+    match /users/{uid} {
+      allow read, write: if isOwner(uid);
+
+      match /{subcollection}/{docId} {
+        allow read, write: if isOwner(uid);
+      }
+    }
+
+    // Claims are created by the passenger once, then only changed by the backend.
+    match /claims/{claimId} {
+      allow read: if signedIn() && resource.data.userId == request.auth.uid;
+
+      allow create: if signedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.claimReference == claimId
+        && request.resource.data.status == 'submitted'
+        && request.resource.data.claimType in ['airline', 'aesa']
+        && request.resource.data.keys().hasOnly([
+             'userId', 'claimReference', 'status', 'claimType', 'createdAt', 'isTest',
+             'flight', 'passenger', 'disruption', 'eligibility', 'signature', 'documents', 'appVersion'
+           ])
+        // Uploaded files must live under this user's and this claim's folder.
+        && request.resource.data.documents.values().size() <= 10;
+
+      allow update, delete: if false;
+    }
+
+    // Outgoing email queue (Firebase "Trigger Email" extension). Written only by Cloud Functions,
+    // so the app can't be used to send arbitrary email.
+    match /mail/{mailId} {
+      allow read, write: if false;
+    }
+
     match /{document=**} {
-      allow read, write: if request.auth != null;
+      allow read, write: if false;
     }
   }
 }

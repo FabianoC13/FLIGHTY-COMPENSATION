@@ -9,6 +9,7 @@ Run:
 """
 
 import os
+import hmac
 import json
 import smtplib
 import ssl
@@ -19,9 +20,13 @@ from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 
 # === Configuration ===
-PORT = 8080
-SMTP_SERVER = "smtp.gmail.com"
-SMTP_PORT = 587
+HOST = os.environ.get("EMAIL_HOST", "127.0.0.1")   # internal service: keep it off the public internet
+PORT = int(os.environ.get("EMAIL_PORT", "8082"))   # payout_server.py uses 8081
+SMTP_SERVER = os.environ.get("SMTP_SERVER", "smtp.gmail.com")
+SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
+# Shared secret callers must send as `Authorization: Bearer <token>`.
+EMAIL_SERVER_TOKEN = os.environ.get("EMAIL_SERVER_TOKEN", "")
+MAX_BODY_BYTES = 5 * 1024 * 1024
 
 # Load credentials from environment
 GMAIL_ADDRESS = os.environ.get("GMAIL_ADDRESS", "")
@@ -72,7 +77,15 @@ def send_email(data: dict) -> tuple[bool, str]:
 class EmailHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         if self.path == "/send-email":
-            content_length = int(self.headers["Content-Length"])
+            if not self._is_authorized():
+                self.send_response(401)
+                self.end_headers()
+                return
+            content_length = int(self.headers.get("Content-Length") or 0)
+            if content_length <= 0 or content_length > MAX_BODY_BYTES:
+                self.send_response(413)
+                self.end_headers()
+                return
             post_data = self.rfile.read(content_length)
             
             try:
@@ -106,6 +119,12 @@ class EmailHandler(BaseHTTPRequestHandler):
             self.send_response(404)
             self.end_headers()
     
+    def _is_authorized(self) -> bool:
+        if not EMAIL_SERVER_TOKEN:
+            return False
+        header = self.headers.get("Authorization", "")
+        return header.startswith("Bearer ") and hmac.compare_digest(header[7:].strip(), EMAIL_SERVER_TOKEN)
+
     def do_GET(self):
         if self.path == "/health":
             self.send_response(200)
@@ -125,7 +144,7 @@ def main():
     print("=" * 50)
     print("🚀 Flighty Compensation Email Server")
     print("=" * 50)
-    print(f"📡 Listening on: http://localhost:{PORT}")
+    print(f"📡 Listening on: http://{HOST}:{PORT}")
     print(f"📧 Sending from: {GMAIL_ADDRESS or '(not configured)'}")
     print("\nEndpoints:")
     print(f"  POST http://localhost:{PORT}/send-email")
@@ -139,7 +158,11 @@ def main():
         print("   export GMAIL_APP_PASSWORD='your_app_password'")
         print()
     
-    server = HTTPServer(("", PORT), EmailHandler)
+    if not EMAIL_SERVER_TOKEN:
+        print("⛔ EMAIL_SERVER_TOKEN is required (shared with payout_server.py).")
+        raise SystemExit(1)
+
+    server = HTTPServer((HOST, PORT), EmailHandler)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
