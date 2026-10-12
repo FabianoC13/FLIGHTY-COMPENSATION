@@ -40,3 +40,7 @@ __pycache__/
 # SwiftPM
 .build/
 .swiftpm/
+Config/Secrets.xcconfig
+
+# Firebase service accounts
+*service-account*.json

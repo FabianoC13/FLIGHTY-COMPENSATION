@@ -1,92 +1,55 @@
-# Flight Compensation iOS App
+# Flight Compensation
 
-Una app premium de iOS para compensación por retrasos de vuelos, inspirada en el diseño de Flighty.
+iOS app (SwiftUI, iOS 17+) that tracks flights and files EU261 / UK261 compensation claims
+for passengers, with a Firebase backend and a Python payout service.
 
-## 🚀 Configuración Rápida
+## Repository layout
 
-### Opción 1: Usar el Script (Recomendado)
+| Path | What it is |
+|---|---|
+| `FlightCompensation/` | iOS app sources (`FlightCompensation.xcodeproj`, or regenerate with XcodeGen from `project.yml`) |
+| `FlightCompensation/Services/EU261Rules.swift` | All compensation rules (scope, distance bands, delays, cancellations, reductions) |
+| `FlightCompensation/Resources/airports.json` | 9,000+ IATA airports with country and coordinates (OurAirports, public domain) |
+| `FlightCompensation/firestore.rules`, `storage.rules` | Security rules (per-user access, claims create-only) |
+| `FlightCompensation/functions/` | Cloud Function `onClaimCreated`: routes and emails each claim |
+| `server/` | `payout_server.py` (dLocal payouts), `email_server.py`, `reconciliation_job.py` |
+| `Tests/EU261Core/` | Swift package that runs the EU261 rules tests on macOS or Linux |
+| `Config/` | Build-time configuration (`App.xcconfig`, git-ignored `Secrets.xcconfig`) |
+| `docs/` | Production checklist and older integration notes |
+
+## Run the app
+
+1. `cp Config/Secrets.example.xcconfig Config/Secrets.xcconfig` and fill it in (all keys are optional for local runs).
+2. Open `FlightCompensation.xcodeproj` in Xcode 15+ and run the `FlightCompensation` scheme.
+
+Without a FlightRadar24 key the app uses mock flight data. In Debug builds the flight codes
+`DELAY001`, `DELAY002` and `CANCEL001` return canned disruptions, and submitted claims are marked
+`isTest`, so the backend sends airline emails to the ops inbox instead of the airline.
+
+## Claim flow
+
+1. Passenger details and booking reference (or a parent/guardian claiming for a child)
+2. What happened: arrival delay, or cancellation notice and re-routing; eligibility and net payout update live
+3. Airline first, or escalation to AESA
+4. Proof of travel (boarding pass or booking confirmation); ID optional, required for AESA
+5. Agreement: service & fee terms, assignment of claim, power of attorney, privacy notice; each accepted explicitly
+6. Signature drawn on screen, confirmed with Face ID; the signed PDF carries an audit trail (time, device, SHA-256)
+7. Review and submit: files go to Storage, the claim to Firestore, and `onClaimCreated` emails the airline,
+   the passenger and ops (or routes the claim to ops when the airline needs its web form)
+
+Competitor research behind this flow: [docs/research/competitor-claim-flows.md](docs/research/competitor-claim-flows.md).
+
+## Tests
 
 ```bash
-./setup.sh
+cd Tests/EU261Core && swift test                      # EU261/UK261 rules
+cd FlightCompensation/functions && npm ci && npm test  # claim email routing
+npm run test:rules                                     # Firestore/Storage rules (needs Java for the emulator)
+python3 -m unittest discover -s server/tests           # payout webhook signature and API token
 ```
 
-Sigue las instrucciones que aparecen en pantalla.
+CI runs all of them on every pull request (`.github/workflows/ci.yml`).
 
-### Opción 2: Configuración Manual
+## Deploy
 
-1. **Abre Xcode** (versión 15.0 o superior)
-
-2. **Crea un nuevo proyecto:**
-   - File → New → Project
-   - Selecciona **iOS** → **App**
-   - Configuración:
-     - Product Name: `FlightCompensation`
-     - Interface: **SwiftUI**
-     - Language: **Swift**
-     - Minimum iOS: **17.0**
-   - Guarda el proyecto en esta carpeta
-
-3. **Agrega los archivos:**
-   - En Xcode, elimina el `ContentView.swift` por defecto si existe
-   - Arrastra la carpeta completa `FlightCompensation` al proyecto
-   - ⚠️ **IMPORTANTE:** Desmarca "Copy items if needed"
-   - Selecciona "Create groups"
-
-4. **Configura el proyecto:**
-   - Ve a las Settings del proyecto
-   - Deployment Target: iOS 17.0
-   - Verifica que SwiftUI esté habilitado
-
-5. **Ejecuta la app:**
-   - Selecciona un simulador (iPhone 15 Pro recomendado)
-   - Presiona ⌘R o haz clic en Run
-
-## 📱 Características
-
-- ✅ Seguimiento de vuelos en tiempo real
-- ✅ Cálculo automático de elegibilidad EU261/UK261
-- ✅ Múltiples formas de agregar vuelos:
-  - Importar desde Apple Wallet
-  - Escanear ticket
-  - Entrada manual
-- ✅ Interfaz limpia inspirada en Flighty
-- ✅ Animaciones suaves y nativas
-- ✅ Arquitectura MVVM
-
-## 🏗️ Estructura del Proyecto
-
-```
-FlightCompensation/
-├── App/              # Punto de entrada y dependencias
-├── Models/           # Modelos de datos
-├── Services/         # Servicios y lógica de negocio
-├── ViewModels/       # ViewModels (MVVM)
-├── Views/            # Vistas SwiftUI
-└── Utilities/        # Utilidades y extensiones
-```
-
-## 🔧 Requisitos
-
-- Xcode 15.0+
-- iOS 17.0+
-- Swift 5.9+
-
-## 📝 Notas
-
-- Los servicios están usando datos mock por defecto
-- El motor de elegibilidad EU261 está completamente implementado
-- La integración con WalletKit está preparada pero necesita implementación real
-
-## 🐛 Troubleshooting
-
-**Error: "Cannot find type 'Flight' in scope"**
-- Asegúrate de que todos los archivos están agregados al target del proyecto
-
-**Error: "Value of type 'X' has no member 'Y'"**
-- Verifica que el Deployment Target sea iOS 17.0
-
-**La app no compila:**
-- Limpia el build: Product → Clean Build Folder (⌘⇧K)
-- Reconstruye: Product → Build (⌘B)
-
-
+See [docs/PRODUCTION_CHECKLIST.md](docs/PRODUCTION_CHECKLIST.md) for every key and setting needed before launch.

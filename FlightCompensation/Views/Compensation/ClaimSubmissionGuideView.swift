@@ -18,7 +18,7 @@ struct ClaimSubmissionGuideView: View {
     }
     
     @State private var state: WrapperState = .processing
-    @State private var processingStep = "Initializing Safe Connection..."
+    @State private var processingStep = "Checking your documents..."
     @State private var isAnimating = false
     @State private var selectedDocument: DocumentPreview?
     @State private var progress: CGFloat = 0.0
@@ -76,7 +76,7 @@ struct ClaimSubmissionGuideView: View {
                             .opacity(isAnimating ? 1.0 : 0.0)
                     }
                     
-                    Text("Claim Sent!")
+                    Text("Claim Submitted!")
                         .font(.largeTitle)
                         .fontWeight(.bold)
                         .foregroundStyle(.white)
@@ -94,12 +94,12 @@ struct ClaimSubmissionGuideView: View {
                 
                 // Status Card
                 VStack(spacing: 20) {
-                    Text("We've handled it.")
+                    Text("We've got it from here.")
                         .font(.title3)
                         .fontWeight(.bold)
                         .foregroundStyle(PremiumTheme.electricBlue)
                     
-                    Text("The Flighty Compensation team has officially submitted your formal complaint to **\(flight.airline.name)** via our priority legal channel.")
+                    Text("We're filing your claim with **\(flight.airline.name)** on your behalf. We'll email you a copy of what you signed and update you at every step.")
                         .multilineTextAlignment(.center)
                         .foregroundStyle(.white.opacity(0.8))
                         .padding(.horizontal)
@@ -173,16 +173,16 @@ struct ClaimSubmissionGuideView: View {
         
         // Step 1
         withAnimation { progress = 0.1 }
-        processingStep = "Encrypting documents..."
+        processingStep = "Securing your documents..."
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             withAnimation { progress = 0.4 }
-            processingStep = "Connecting to secure server..."
+            processingStep = "Uploading signed authorisation..."
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
             withAnimation { progress = 0.7 }
-            processingStep = "Submitting claim to \(flight.airline.name)..."
+            processingStep = "Preparing your claim for \(flight.airline.name)..."
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 3.5) {

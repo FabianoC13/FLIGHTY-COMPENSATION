@@ -108,27 +108,27 @@ final class FlightsListViewModel: ObservableObject {
                 // Create delay event if flight is delayed or cancelled
                 if status == .delayed || status == .cancelled {
                     if delayEvents.isEmpty {
-                        let flightCode = "\(updatedFlight.airline.code)\(updatedFlight.flightNumber)".uppercased()
                         var delayDuration: TimeInterval = 0
                         
-                        // Use specific delays for test codes
-                        if flightCode == "DELAY001" {
-                            delayDuration = 4.5 * 3600.0 // 4.5 hours (simulated if service didn't provide one)
-                        } else if flightCode == "DELAY002" {
-                            delayDuration = 3.0 * 3600.0 // 3 hours
-                        } else {
-                            // Random delay between 3-5 hours for other delays
-                            delayDuration = Double.random(in: 3.0...5.0) * 3600.0
+                        // No measured arrival delay: record the disruption with an unconfirmed (0) duration.
+                        // The claim flow asks the passenger when they actually arrived.
+                        #if DEBUG
+                        let flightCode = "\(updatedFlight.airline.code)\(updatedFlight.flightNumber)".uppercased()
+                        if status == .delayed && flightCode == "DELAY001" {
+                            delayDuration = 4.5 * 3600.0
+                        } else if status == .delayed && flightCode == "DELAY002" {
+                            delayDuration = 3.0 * 3600.0
                         }
+                        #endif
                         
                         let delayEvent = DelayEvent(
                             type: status == .cancelled ? .cancellation : .delay,
                             duration: delayDuration,
-                            actualTime: status == .cancelled ? nil : Date(),
-                            reason: status == .cancelled ? "Flight cancelled by airline" : "Operational delay"
+                            actualTime: nil,
+                            reason: nil
                         )
                         delayEvents.append(delayEvent)
-                        print("✅ [List] Created simulated delay event: \(delayEvent.type) - \(Int(delayDuration / 3600)) hours")
+                        print("✅ [List] Created delay event: \(delayEvent.type) - \(Int(delayDuration / 3600)) hours")
                     } else {
                         print("ℹ️ [List] Delay events already provided by service; skipping simulated append")
                     }

@@ -29,10 +29,14 @@ struct ClaimFlowView: View {
                             switch viewModel.currentStep {
                             case .passengerDetails:
                                 PassengerFormView(viewModel: viewModel)
+                            case .disruptionDetails:
+                                DisruptionDetailsView(viewModel: viewModel)
                             case .claimTypeSelection:
                                 ClaimTypeSelectionView(viewModel: viewModel)
                             case .evidenceUpload:
                                 DocumentUploadView(viewModel: viewModel)
+                            case .agreements:
+                                ClaimAgreementsView(viewModel: viewModel)
                             case .representationSignature:
                                 RepresentationSignatureView(viewModel: viewModel)
                             case .review:
@@ -67,8 +71,11 @@ struct ClaimFlowView: View {
                                 action: {
                                     HapticsManager.shared.impact(style: .heavy)
                                     Task {
-                                        let isAuthenticated = await BiometricService.shared.authenticateUser(reason: "Verify your identity to submit the claim")
-                                        if isAuthenticated {
+                                        let isAuthenticated = await BiometricService.shared.authenticateUser(reason: "Confirm your identity to sign and submit the claim")
+                                        if !isAuthenticated {
+                                            viewModel.submissionError = "We couldn't confirm your identity. Please try again."
+                                            HapticsManager.shared.notification(type: .error)
+                                        } else {
                                             await viewModel.submitClaim()
                                             if viewModel.isSuccess {
                                                 HapticsManager.shared.notification(type: .success)
@@ -109,6 +116,14 @@ struct ClaimFlowView: View {
                             .background(Circle().fill(.ultraThinMaterial))
                     }
                 }
+            }
+            .alert("Couldn't submit the claim", isPresented: Binding(
+                get: { viewModel.submissionError != nil },
+                set: { if !$0 { viewModel.submissionError = nil } }
+            )) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text(viewModel.submissionError ?? "")
             }
             .fullScreenCover(isPresented: $viewModel.isSuccess) {
                 if let ref = viewModel.claimReference {
@@ -163,27 +178,49 @@ struct ClaimReviewView: View {
             
             ReviewSection(title: "Passenger") {
                 VStack(alignment: .leading, spacing: 8) {
-                    LabeledContentRow(label: "Name", value: "\(viewModel.claimRequest.passengerDetails.firstName) \(viewModel.claimRequest.passengerDetails.lastName)")
+                    LabeledContentRow(label: "Name", value: viewModel.claimRequest.passengerDetails.travellerFullName)
+                    if viewModel.claimRequest.passengerDetails.minor != nil {
+                        Divider().background(Color.white.opacity(0.1))
+                        LabeledContentRow(label: "Signed by", value: viewModel.claimRequest.passengerDetails.signerFullName)
+                    }
+                    Divider().background(Color.white.opacity(0.1))
+                    LabeledContentRow(label: "Booking", value: viewModel.claimRequest.passengerDetails.bookingReference.uppercased())
                     Divider().background(Color.white.opacity(0.1))
                     LabeledContentRow(label: "Document", value: "\(viewModel.claimRequest.passengerDetails.documentType.rawValue) - \(viewModel.claimRequest.passengerDetails.documentNumber)")
+                }
+            }
+
+            ReviewSection(title: "Compensation") {
+                VStack(alignment: .leading, spacing: 8) {
+                    LabeledContentRow(label: "Claim", value: viewModel.amountText, valueColor: PremiumTheme.goldStart)
+                    Divider().background(Color.white.opacity(0.1))
+                    LabeledContentRow(label: "You receive", value: viewModel.netPayoutText)
+                    Divider().background(Color.white.opacity(0.1))
+                    LabeledContentRow(label: "Reference", value: viewModel.pendingReference)
                 }
             }
             
             ReviewSection(title: "Documents") {
                 VStack(alignment: .leading, spacing: 8) {
-                    LabeledContentRow(label: "Boarding Pass", value: "Uploaded", valueColor: .green)
+                    let evidence = viewModel.claimRequest.evidence
+                    LabeledContentRow(label: "Boarding Pass", value: evidence.boardingPassImage != nil ? "Added" : "Not added",
+                                      valueColor: evidence.boardingPassImage != nil ? .green : .white.opacity(0.5))
                     Divider().background(Color.white.opacity(0.1))
-                    LabeledContentRow(label: "ID/Passport", value: "Uploaded", valueColor: .green)
+                    LabeledContentRow(label: "Booking confirmation", value: evidence.bookingConfirmationImage != nil ? "Added" : "Not added",
+                                      valueColor: evidence.bookingConfirmationImage != nil ? .green : .white.opacity(0.5))
+                    Divider().background(Color.white.opacity(0.1))
+                    LabeledContentRow(label: "ID/Passport", value: evidence.identityDocumentImage != nil ? "Added" : "Not added",
+                                      valueColor: evidence.identityDocumentImage != nil ? .green : .white.opacity(0.5))
                 }
             }
             
-            ReviewSection(title: "Representation") {
+            ReviewSection(title: "Authorisation") {
                 HStack {
-                    if viewModel.claimRequest.representationAuth != nil {
-                        Label("Digitally Signed", systemImage: "signature")
+                    if viewModel.signatureStrokeImage != nil && viewModel.claimRequest.consents.allRequiredAccepted {
+                        Label("Accepted and signed", systemImage: "signature")
                             .foregroundStyle(PremiumTheme.goldStart)
                     } else {
-                        Label("Missing Signature", systemImage: "exclamationmark.triangle")
+                        Label("Missing signature", systemImage: "exclamationmark.triangle")
                             .foregroundStyle(.red)
                     }
                     Spacer()
@@ -248,7 +285,7 @@ struct ClaimTypeSelectionView: View {
                 .foregroundStyle(.white)
                 .padding(.top)
             
-            Text("AESA requires you to contact the airline first. If they denied your request or didn't answer in 30 days, we can escalate.")
+            Text("Airlines must be contacted first. If they rejected your claim or didn't answer within a month, we escalate it to AESA, the Spanish enforcement body.")
                 .font(.body)
                 .foregroundStyle(.white.opacity(0.8))
                 .multilineTextAlignment(.center)

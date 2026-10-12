@@ -10,26 +10,27 @@ final class UserProfileService: ObservableObject {
     private let profileKey = "user_profile_data"
     
     private init() {
+        KeychainStore.migrateFromUserDefaults(profileKey)
         loadProfile()
     }
     
     func saveProfile(_ profile: UserProfile) {
         if let data = try? JSONEncoder().encode(profile) {
-            UserDefaults.standard.set(data, forKey: profileKey)
+            KeychainStore.set(data, for: profileKey)
             self.userProfile = profile
             self.hasOnboarded = true
         }
     }
     
     func loadProfile() {
-        if let data = UserDefaults.standard.data(forKey: profileKey),
+        if let data = KeychainStore.data(for: profileKey),
            let profile = try? JSONDecoder().decode(UserProfile.self, from: data) {
             self.userProfile = profile
         }
     }
     
     func clearProfile() {
-        UserDefaults.standard.removeObject(forKey: profileKey)
+        KeychainStore.remove(profileKey)
         self.userProfile = nil
         self.hasOnboarded = false
     }

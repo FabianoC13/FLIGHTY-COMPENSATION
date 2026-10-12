@@ -184,8 +184,8 @@ struct FlightDetailView: View {
             if let url = documentURL, let flight = viewModel.flight {
                 MailView(
                     result: $mailResult,
-                    recipients: [flight.flightNumber.lowercased() == "delay001" ? "fabianocalvaye@gmail.com" : flight.airline.claimEmail],
-                    ccRecipients: ["claims@flightcompensation.app"],
+                    recipients: [flight.airline.claimEmail ?? Config.claimsOpsEmail],
+                    ccRecipients: [Config.claimsOpsEmail],
                     subject: "Formal Complaint - Flight \(flight.displayFlightNumber)",
                     messageBody: """
                     To whom it may concern,
@@ -195,7 +195,7 @@ struct FlightDetailView: View {
                     I request that you process this claim in accordance with Regulation (EC) No 261/2004.
                     
                     Sincerely,
-                    Passenger
+                    \(UserProfileService.shared.userProfile.map { "\($0.firstName) \($0.lastName)" } ?? "")
                     """,
                     attachmentData: try? Data(contentsOf: url),
                     attachmentFileName: url.lastPathComponent

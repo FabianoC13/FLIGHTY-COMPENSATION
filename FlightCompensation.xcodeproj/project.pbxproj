@@ -15,7 +15,6 @@
 		14BA72D1EDDE450AAA6A120A /* FlightCompensationApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74FBC61B4AED9DBBE0E16ADB /* FlightCompensationApp.swift */; };
 		2080AA3D74EF65C3A15A578F /* FlightDelayAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A26BC18D4F718A712E38223D /* FlightDelayAnimationView.swift */; };
 		20C05F8A4DBD8782D63AE33B /* FlightsGlobeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED63B3CDC9D1FA26A3BE11C8 /* FlightsGlobeView.swift */; };
-		221B7BCA7B63C6F4E0C154EB /* EmailService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83BFBD4301F3C34D05C5E04A /* EmailService.swift */; };
 		27A756D00F91ECD409C4B86B /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = D164057FF4325B47FFB24EC1 /* Config.swift */; };
 		28D7171CDC9E0C49A5E6000D /* MailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DD49FAF77AE7BD299F75452 /* MailView.swift */; };
 		2E2871AA8E10F570F9922719 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DDB34EC44CEBB799CCED9B1 /* NotificationManager.swift */; };
@@ -92,6 +91,15 @@
 		FB799089618CD6B3A36C625B /* AddFlightView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042999E223326F06FC59DACF /* AddFlightView.swift */; };
 		FE1214BFCD8BA9C5439901EF /* TicketScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17E74BE5D100643FE5E0F821 /* TicketScanView.swift */; };
 		FEC40EA0DEA71E704B9DD004 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 49D0BBCC27D42A41E9B741F2 /* GoogleSignIn */; };
+		228E768385FB0795EC442E7D /* AirportDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2678DA2AA68A808291C517 /* AirportDatabase.swift */; };
+		CB93B2401111B17E57780EBA /* EU261Jurisdiction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B96BF3890326A66A0C643B /* EU261Jurisdiction.swift */; };
+		A9258FB9EDC5D62BB3B76856 /* EU261Rules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FE9DBAE801FC892A6E0EBAD /* EU261Rules.swift */; };
+		C91EAE31059B838982C0374C /* ClaimAgreementText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AA4EBC14B47FF259FAB0E89 /* ClaimAgreementText.swift */; };
+		7481AC15782C25771D91D24A /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC72A8DC54C3959DEB28C7B7 /* KeychainStore.swift */; };
+		D881F330854175CC63EA38C4 /* DisruptionDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCA2EF8198BE77C093E902F /* DisruptionDetailsView.swift */; };
+		F727817921D8A0F0717A418E /* ClaimAgreementsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F900C9CE30351B91918AA29 /* ClaimAgreementsView.swift */; };
+		FF4DC7907F3B11B9B8283D18 /* airports.json in Resources */ = {isa = PBXBuildFile; fileRef = 121485FC0FC4F11CF531AE89 /* airports.json */; };
+		DD0272B2584C33BB361D7131 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = D2A44C660645D2AAAFA13F0F /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -131,7 +139,6 @@
 		7F1E13CE7B68CA5939CE63AA /* WalletImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletImportView.swift; sourceTree = "<group>"; };
 		81DA6483BE20353360B355EB /* FlightCompensation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlightCompensation.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		82BAEACE640D70C36E0FA826 /* DelayEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelayEvent.swift; sourceTree = "<group>"; };
-		83BFBD4301F3C34D05C5E04A /* EmailService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailService.swift; sourceTree = "<group>"; };
 		83C63580537CC6F4293A1F0A /* BackgroundTrackingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundTrackingManager.swift; sourceTree = "<group>"; };
 		84BE2085C52BAD6874232C38 /* AuthenticationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationService.swift; sourceTree = "<group>"; };
 		8538B3892E4E1A23E1C872ED /* SubmissionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubmissionService.swift; sourceTree = "<group>"; };
@@ -176,6 +183,16 @@
 		FC1BF6C2281902F8A1C52E25 /* FlightDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightDetailView.swift; sourceTree = "<group>"; };
 		FE40B2B4C643B9A379BF3F55 /* CustomDesignComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomDesignComponents.swift; sourceTree = "<group>"; };
 		FE7E98E67D67AD7B82FB2EF1 /* Airport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Airport.swift; sourceTree = "<group>"; };
+		CF2678DA2AA68A808291C517 /* AirportDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirportDatabase.swift; sourceTree = "<group>"; };
+		88B96BF3890326A66A0C643B /* EU261Jurisdiction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EU261Jurisdiction.swift; sourceTree = "<group>"; };
+		0FE9DBAE801FC892A6E0EBAD /* EU261Rules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EU261Rules.swift; sourceTree = "<group>"; };
+		5AA4EBC14B47FF259FAB0E89 /* ClaimAgreementText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimAgreementText.swift; sourceTree = "<group>"; };
+		FC72A8DC54C3959DEB28C7B7 /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
+		ACCA2EF8198BE77C093E902F /* DisruptionDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisruptionDetailsView.swift; sourceTree = "<group>"; };
+		1F900C9CE30351B91918AA29 /* ClaimAgreementsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimAgreementsView.swift; sourceTree = "<group>"; };
+		121485FC0FC4F11CF531AE89 /* airports.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "Resources/airports.json"; sourceTree = "<group>"; };
+		D2A44C660645D2AAAFA13F0F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		3ECAAD4291678B51B9AB809B /* App.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Config/App.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -197,6 +214,7 @@
 		0B4430FCDC45985FF314C5FF /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				FC72A8DC54C3959DEB28C7B7 /* KeychainStore.swift */,
 				83C63580537CC6F4293A1F0A /* BackgroundTrackingManager.swift */,
 				D164057FF4325B47FFB24EC1 /* Config.swift */,
 				CF93009479756E691366BE73 /* Constants.swift */,
@@ -248,11 +266,14 @@
 		62BC3FD0E296433EA4737B18 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				5AA4EBC14B47FF259FAB0E89 /* ClaimAgreementText.swift */,
+				0FE9DBAE801FC892A6E0EBAD /* EU261Rules.swift */,
+				88B96BF3890326A66A0C643B /* EU261Jurisdiction.swift */,
+				CF2678DA2AA68A808291C517 /* AirportDatabase.swift */,
 				84BE2085C52BAD6874232C38 /* AuthenticationService.swift */,
 				7362D921259F98E96FAD9A86 /* BiometricService.swift */,
 				F218B551375D811378C75B70 /* ClaimDocumentService.swift */,
 				F48F919EEC3FEFDDFCD6FE14 /* EligibilityService.swift */,
-				83BFBD4301F3C34D05C5E04A /* EmailService.swift */,
 				120B283D3136BD63B859732D /* EU261EligibilityService.swift */,
 				EA9DD65C837F08422BB5F42A /* FlightRadar24Service.swift */,
 				AE83DE8A03B198B7D2182E8B /* FlightStorageService.swift */,
@@ -271,6 +292,7 @@
 		700A20254425DA34A624BB25 = {
 			isa = PBXGroup;
 			children = (
+				3ECAAD4291678B51B9AB809B /* App.xcconfig */,
 				BE416C4A8E7F4F27A76EB068 /* FlightCompensation */,
 				346E17EFF35D976D0A5D3623 /* Products */,
 			);
@@ -313,6 +335,8 @@
 		BE416C4A8E7F4F27A76EB068 /* FlightCompensation */ = {
 			isa = PBXGroup;
 			children = (
+				D2A44C660645D2AAAFA13F0F /* PrivacyInfo.xcprivacy */,
+				121485FC0FC4F11CF531AE89 /* airports.json */,
 				CE6545B3317993FA4EAD4857 /* Assets.xcassets */,
 				1DF90E5C47C7C2D4AF610804 /* GoogleService-Info.plist */,
 				F10472A842FDE8BD22B67E4F /* App */,
@@ -396,6 +420,8 @@
 		FC369A535D19133D3B8C0A81 /* Compensation */ = {
 			isa = PBXGroup;
 			children = (
+				1F900C9CE30351B91918AA29 /* ClaimAgreementsView.swift */,
+				ACCA2EF8198BE77C093E902F /* DisruptionDetailsView.swift */,
 				C2662E1F7113323FA1DAECB9 /* ClaimFlowView.swift */,
 				8C521C7E8128E70DA0167838 /* ClaimSubmissionGuideView.swift */,
 				736D64F9CD8DD27F4D554D89 /* CompensationView.swift */,
@@ -477,6 +503,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DD0272B2584C33BB361D7131 /* PrivacyInfo.xcprivacy in Resources */,
+				FF4DC7907F3B11B9B8283D18 /* airports.json in Resources */,
 				F0F7E914C79863124E2165FF /* Assets.xcassets in Resources */,
 				BEE776BA711553A9035E6B88 /* GoogleService-Info.plist in Resources */,
 			);
@@ -489,6 +517,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F727817921D8A0F0717A418E /* ClaimAgreementsView.swift in Sources */,
+				D881F330854175CC63EA38C4 /* DisruptionDetailsView.swift in Sources */,
+				7481AC15782C25771D91D24A /* KeychainStore.swift in Sources */,
+				C91EAE31059B838982C0374C /* ClaimAgreementText.swift in Sources */,
+				A9258FB9EDC5D62BB3B76856 /* EU261Rules.swift in Sources */,
+				CB93B2401111B17E57780EBA /* EU261Jurisdiction.swift in Sources */,
+				228E768385FB0795EC442E7D /* AirportDatabase.swift in Sources */,
 				FB799089618CD6B3A36C625B /* AddFlightView.swift in Sources */,
 				5B5EC5495184DA4C9579DC17 /* AddFlightViewModel.swift in Sources */,
 				BF01AA48ED2A8409E43B81C2 /* Airline+Contact.swift in Sources */,
@@ -516,7 +551,6 @@
 				7990F5ADE68088161E2C2F00 /* DocumentUploadView.swift in Sources */,
 				005A5A8981E97E6EF547899D /* EU261EligibilityService.swift in Sources */,
 				5EEFF3BAF096D83636D98968 /* EligibilityService.swift in Sources */,
-				221B7BCA7B63C6F4E0C154EB /* EmailService.swift in Sources */,
 				D05AC2A02FE0C53FD90B73FD /* Flight.swift in Sources */,
 				0F06A7158C7A4FA5FD250FCB /* FlightCardView.swift in Sources */,
 				FR0WV1EW12345678901234AB /* FlightRowView.swift in Sources */,
@@ -575,6 +609,7 @@
 /* Begin XCBuildConfiguration section */
 		314B81DCAA3DDB29A587AF5B /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3ECAAD4291678B51B9AB809B /* App.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = FlightCompensation.entitlements;
@@ -603,6 +638,7 @@
 		};
 		7D531843AF5807E154EA466C /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3ECAAD4291678B51B9AB809B /* App.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = FlightCompensation.entitlements;
@@ -623,7 +659,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.flightcompensation.app;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.9;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
