@@ -1,0 +1,24 @@
+// Build-time configuration for FlightCompensation. Values are copied into Info.plist and read by
+// Config.swift. Put real values in Config/Secrets.xcconfig (git-ignored; copy Secrets.example.xcconfig).
+// Note: xcconfig treats "//" as a comment, so write URLs as https:/$()/example.com
+
+FLIGHT_RADAR24_API_KEY =
+FLIGHT_RADAR24_SANDBOX = NO
+USE_REAL_FLIGHT_TRACKING =
+
+// Legal entity named in the documents passengers sign. Release builds refuse to submit claims
+// until COMPANY_LEGAL_NAME, COMPANY_REGISTRATION_NUMBER and COMPANY_ADDRESS are set.
+COMPANY_LEGAL_NAME =
+COMPANY_REGISTRATION_NUMBER =
+COMPANY_ADDRESS =
+COMPANY_EMAIL =
+CLAIMS_OPS_EMAIL =
+COLLECTION_IBAN =
+COLLECTION_BIC =
+TERMS_URL =
+PRIVACY_URL =
+GOVERNING_LAW = Spain
+SUCCESS_FEE_PERCENT = 25
+LEGAL_ACTION_FEE_PERCENT = 10
+
+#include? "Secrets.xcconfig"

@@ -83,11 +83,11 @@ final class FlightDetailViewModel: ObservableObject {
                         let delayEvent = DelayEvent(
                             type: status == .cancelled ? .cancellation : .delay,
                             duration: delayDuration,
-                            actualTime: status == .cancelled ? nil : Date(),
-                            reason: status == .cancelled ? "Flight cancelled by airline" : "Operational delay"
+                            actualTime: nil,
+                            reason: nil
                         )
                         delayEvents.append(delayEvent)
-                        print("✅ [Detail] Appended simulated delay event: \(delayEvent.type) duration=\(delayEvent.duration/3600)h")
+                        print("✅ [Detail] Appended delay event: \(delayEvent.type) duration=\(delayEvent.duration/3600)h")
                     } else {
                         // Service already provided delay/cancellation events - don't duplicate
                         print("ℹ️ [Detail] Delay events already provided by service; skipping simulated append")
@@ -138,24 +138,17 @@ final class FlightDetailViewModel: ObservableObject {
         }
     }
     
+    /// Arrival delay to record when the tracking service reports a disruption without times.
+    /// Never invent a number: 0 means "not confirmed", and the claim flow asks the passenger.
     private func calculateDelayDuration(flight: Flight, status: FlightStatus) -> TimeInterval {
-        // Simulate delay duration (in a real app, this would come from the tracking service)
-        // For delays, simulate 3-5 hours, for cancellations use 0
-        
-        // Testing: Use specific delays for test flight codes
+        if status == .cancelled { return 0 }
+        #if DEBUG
+        // Test flight codes used in development (see MockFlightTrackingService / FlightRadar24Service).
         let flightCode = "\(flight.airline.code)\(flight.flightNumber)".uppercased()
-        if flightCode == "DELAY001" {
-            return 4.5 * 3600.0 // 4.5 hours delay
-        } else if flightCode == "DELAY002" {
-            return 3.0 * 3600.0 // 3 hours delay
-        }
-        
-        if status == .cancelled {
-            return 0
-        }
-        // Random delay between 3-5 hours for demonstration
-        let delayHours = Double.random(in: 3.0...5.0)
-        return delayHours * 3600.0
+        if flightCode == "DELAY001" { return 4.5 * 3600.0 }
+        if flightCode == "DELAY002" { return 3.0 * 3600.0 }
+        #endif
+        return 0
     }
     
     func checkEligibility() {
@@ -236,7 +229,8 @@ final class FlightDetailViewModel: ObservableObject {
         
         Task {
             // If there's an active delay, check actual eligibility
-            if flight.hasActiveDelay, let delayEvent = flight.latestDelayEvent {
+            // A landed flight with a measured delay still counts.
+            if let delayEvent = flight.latestDelayEvent, flight.hasActiveDelay || delayEvent.isDurationKnown {
                 let result = await eligibilityService.checkEligibility(for: flight, delayEvent: delayEvent)
                 await MainActor.run {
                     eligibility = result

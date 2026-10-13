@@ -2,8 +2,10 @@ import Foundation
 
 extension Airline {
     
-    /// Returns the best known email address for submitting claims to this airline.
-    var claimEmail: String {
+    /// Best known claims inbox, used only when the passenger emails the airline themselves.
+    /// Claims submitted through the app are routed server-side (functions/airlines.js).
+    /// `nil` when we don't know the inbox: never guess an address and send personal data to it.
+    var claimEmail: String? {
         switch code.uppercased() {
             // MARK: - Spanish & Major EU Airlines
         case "IB": return "reclamaciones@iberia.es"         // Iberia
@@ -60,12 +62,7 @@ extension Airline {
             
             // MARK: - Fallback
         default:
-            // Attempt to guess based on name, but default to a "claims@" pattern
-            let sanitizedName = name.lowercased()
-                .replacingOccurrences(of: " ", with: "")
-                .replacingOccurrences(of: "airlines", with: "")
-                .replacingOccurrences(of: "airways", with: "")
-            return "claims@\(sanitizedName).com"
+            return nil
         }
     }
 }

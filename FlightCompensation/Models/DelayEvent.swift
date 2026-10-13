@@ -24,7 +24,14 @@ struct DelayEvent: Codable, Equatable, Hashable, Identifiable {
         duration / 3600.0
     }
     
+    /// Delay events created from a status change alone carry no measured duration (0).
+    var isDurationKnown: Bool {
+        type == .delay && duration > 0
+    }
+    
     var formattedDuration: String {
+        if type == .cancellation { return "Cancelled" }
+        if !isDurationKnown { return "Not confirmed yet" }
         let hours = Int(durationInHours)
         let minutes = Int((durationInHours.truncatingRemainder(dividingBy: 1)) * 60)
         

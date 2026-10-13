@@ -37,7 +37,7 @@
 	<dict/>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
-		<string>armv7</string>
+		<string>arm64</string>
 	</array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
@@ -55,7 +55,7 @@
 	<string>We use your location to show flight paths and airport information on the map.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>We use your location to show flight paths and airport information on the map.</string>
-    <key>GIDClientID</key>
+	<key>GIDClientID</key>
 	<string>1091915389454-p26vcjmskod2d7s768qq2i48q5f4dooe.apps.googleusercontent.com</string>
 	<key>CFBundleURLTypes</key>
 	<array>
@@ -66,5 +66,37 @@
 			</array>
 		</dict>
 	</array>
+	<key>FLIGHT_RADAR24_API_KEY</key>
+	<string>$(FLIGHT_RADAR24_API_KEY)</string>
+	<key>FLIGHT_RADAR24_SANDBOX</key>
+	<string>$(FLIGHT_RADAR24_SANDBOX)</string>
+	<key>USE_REAL_FLIGHT_TRACKING</key>
+	<string>$(USE_REAL_FLIGHT_TRACKING)</string>
+	<key>COMPANY_LEGAL_NAME</key>
+	<string>$(COMPANY_LEGAL_NAME)</string>
+	<key>COMPANY_REGISTRATION_NUMBER</key>
+	<string>$(COMPANY_REGISTRATION_NUMBER)</string>
+	<key>COMPANY_ADDRESS</key>
+	<string>$(COMPANY_ADDRESS)</string>
+	<key>COMPANY_EMAIL</key>
+	<string>$(COMPANY_EMAIL)</string>
+	<key>CLAIMS_OPS_EMAIL</key>
+	<string>$(CLAIMS_OPS_EMAIL)</string>
+	<key>COLLECTION_IBAN</key>
+	<string>$(COLLECTION_IBAN)</string>
+	<key>COLLECTION_BIC</key>
+	<string>$(COLLECTION_BIC)</string>
+	<key>TERMS_URL</key>
+	<string>$(TERMS_URL)</string>
+	<key>PRIVACY_URL</key>
+	<string>$(PRIVACY_URL)</string>
+	<key>GOVERNING_LAW</key>
+	<string>$(GOVERNING_LAW)</string>
+	<key>SUCCESS_FEE_PERCENT</key>
+	<string>$(SUCCESS_FEE_PERCENT)</string>
+	<key>LEGAL_ACTION_FEE_PERCENT</key>
+	<string>$(LEGAL_ACTION_FEE_PERCENT)</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>

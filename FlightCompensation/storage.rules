@@ -1,0 +1,27 @@
+rules_version = '2';
+
+// Claim files: signed authorisation PDFs, airline letters, ID / boarding pass scans.
+// Path: claims/{uid}/{claimReference}/{fileName}
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    match /claims/{uid}/{claimId}/{fileName} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+
+      // Create only: a signed document can never be overwritten or deleted from the app.
+      // (Overwriting object data is evaluated as `create`, hence `resource == null`.)
+      allow create: if request.auth != null
+        && request.auth.uid == uid
+        && resource == null
+        && request.resource.size < 10 * 1024 * 1024
+        && (request.resource.contentType == 'application/pdf'
+            || request.resource.contentType.matches('image/(jpeg|png|heic)'));
+
+      allow update, delete: if false;
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

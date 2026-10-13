@@ -9,8 +9,7 @@ final class FlightRadar24Service: FlightTrackingService {
     
     init(apiKey: String) {
         self.apiKey = apiKey
-        // Detect if it's a sandbox token (sandbox tokens often have specific patterns)
-        self.isSandbox = apiKey.contains("sandbox") || apiKey.contains("REDACTED")
+        self.isSandbox = Config.flightRadar24UsesSandbox
     }
     
     func trackFlight(_ flight: Flight) async throws -> FlightStatus {
@@ -34,8 +33,13 @@ final class FlightRadar24Service: FlightTrackingService {
         return try await fetchFlightDetails(flightNumber: formattedFlightNumber, existingFlight: flight)
     }
     
+    /// Development-only flight codes that return canned disruptions. Disabled in Release builds.
     private func isTestFlightCode(_ code: String) -> Bool {
+        #if DEBUG
         return code == "DELAY001" || code == "DELAY002" || code == "CANCEL001"
+        #else
+        return false
+        #endif
     }
     
     private func createTestFlight(flightCode: String, existingFlight: Flight) -> Flight {
@@ -745,20 +749,31 @@ final class FlightRadar24Service: FlightTrackingService {
                 }
             }
             
-            // Try real/actual times if available
-            if let real = timeData["real"] as? [String: Any] {
-                if let depTimestamp = extractTimestamp(from: real["departure"]) {
-                    print("   Found real departure time: \(Date(timeIntervalSince1970: TimeInterval(depTimestamp)))")
-                }
-                if let arrTimestamp = extractTimestamp(from: real["arrival"]) {
-                    print("   Found real arrival time: \(Date(timeIntervalSince1970: TimeInterval(arrTimestamp)))")
-                }
-            } else if let actual = timeData["actual"] as? [String: Any] {
-                if let depTimestamp = extractTimestamp(from: actual["departure"]) {
-                    print("   Found actual departure time: \(Date(timeIntervalSince1970: TimeInterval(depTimestamp)))")
-                }
-                if let arrTimestamp = extractTimestamp(from: actual["arrival"]) {
-                    print("   Found actual arrival time: \(Date(timeIntervalSince1970: TimeInterval(arrTimestamp)))")
+            // Real/actual arrival time → measured arrival delay (what EU261 compensates).
+            let actualTimes = (timeData["real"] as? [String: Any]) ?? (timeData["actual"] as? [String: Any])
+            if let actualTimes, let arrTimestamp = extractTimestamp(from: actualTimes["arrival"]) {
+                let actualArrival = Date(timeIntervalSince1970: TimeInterval(arrTimestamp))
+                let arrivalDelay = actualArrival.timeIntervalSince(finalFlight.scheduledArrival)
+                print("   Found actual arrival time: \(actualArrival), delay \(Int(arrivalDelay / 60)) min")
+                // Ignore small delays and keep any event the app already recorded.
+                if arrivalDelay >= 15 * 60 && !finalFlight.delayEvents.contains(where: { $0.type == .cancellation }) {
+                    var events = finalFlight.delayEvents.filter { $0.type != .delay }
+                    events.append(DelayEvent(type: .delay, duration: arrivalDelay, actualTime: actualArrival, reason: nil))
+                    finalFlight = Flight(
+                        id: finalFlight.id,
+                        flightNumber: finalFlight.flightNumber,
+                        airline: finalFlight.airline,
+                        departureAirport: finalFlight.departureAirport,
+                        arrivalAirport: finalFlight.arrivalAirport,
+                        scheduledDeparture: finalFlight.scheduledDeparture,
+                        scheduledArrival: finalFlight.scheduledArrival,
+                        status: finalFlight.status,
+                        currentStatus: .delayed,
+                        delayEvents: events,
+                        claimStatus: existingFlight.claimStatus,
+                        claimReference: existingFlight.claimReference,
+                        claimDate: existingFlight.claimDate
+                    )
                 }
             }
             

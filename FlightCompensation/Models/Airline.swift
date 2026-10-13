@@ -13,10 +13,9 @@ struct Airline: Codable, Equatable, Hashable, Identifiable {
         self.logoURL = logoURL
     }
     
+    /// Holds an EU/EEA/Swiss operating licence (a "Community carrier" under EU261).
     var isEUAirline: Bool {
-        // EU airline codes
-        let euCodes = ["FR", "BA", "LH", "AF", "KL", "IB", "VY", "SN", "LX", "OS", "TP", "DY", "U2"]
-        return euCodes.contains(code)
+        EU261Jurisdiction.isEUCarrier(code)
     }
     
 

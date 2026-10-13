@@ -28,7 +28,7 @@ STATEMENTS_DIR = "bank_statements"
 PAYOUT_DELAY_HOURS = 48  # Wait 48 hours after receiving funds before payout
 
 # Payout server URL
-PAYOUT_SERVER_URL = "http://localhost:8080"
+PAYOUT_SERVER_URL = os.environ.get("PAYOUT_SERVER_URL", "http://127.0.0.1:8081")
 
 
 # === Database Operations ===
@@ -413,6 +413,7 @@ def trigger_due_payouts():
             # Get recipient details first
             req = urllib.request.Request(
                 f"{PAYOUT_SERVER_URL}/api/recipients/claim/{claim_id}",
+                headers={"Authorization": f"Bearer {os.environ.get('PAYOUT_API_TOKEN', '')}"},
                 method="GET"
             )
             with urllib.request.urlopen(req, timeout=10) as resp:

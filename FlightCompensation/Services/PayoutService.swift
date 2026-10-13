@@ -145,7 +145,9 @@ final class PayoutService {
     }
     
     private func loadRecipientsFromDisk() -> [PayoutRecipient] {
-        guard let data = UserDefaults.standard.data(forKey: recipientsKey) else {
+        // Bank details live in the Keychain; older builds kept them in UserDefaults.
+        KeychainStore.migrateFromUserDefaults(recipientsKey)
+        guard let data = KeychainStore.data(for: recipientsKey) else {
             return []
         }
         let decoder = JSONDecoder()
@@ -157,7 +159,7 @@ final class PayoutService {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
         if let data = try? encoder.encode(recipients) {
-            UserDefaults.standard.set(data, forKey: recipientsKey)
+            KeychainStore.set(data, for: recipientsKey)
         }
     }
     

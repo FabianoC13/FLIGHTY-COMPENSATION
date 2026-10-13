@@ -29,8 +29,17 @@ import threading
 import time
 
 # === Configuration ===
-PORT = 8080
-DATABASE_FILE = "payouts.db"
+# Defaults bind to localhost; put the server behind an HTTPS reverse proxy in production.
+HOST = os.environ.get("PAYOUT_HOST", "127.0.0.1")
+PORT = int(os.environ.get("PAYOUT_PORT", "8081"))
+DATABASE_FILE = os.environ.get("PAYOUT_DB_FILE", "payouts.db")
+# Public HTTPS base URL dLocal calls back (e.g. https://payouts.example.com).
+PUBLIC_BASE_URL = os.environ.get("PUBLIC_BASE_URL", f"http://localhost:{PORT}")
+# Bearer token required on every /api/* call (back-office tools only; the app never calls this server).
+PAYOUT_API_TOKEN = os.environ.get("PAYOUT_API_TOKEN", "")
+# Explicit opt-in to run without webhook signatures / API token. Never set in production.
+DEV_MODE = os.environ.get("PAYOUT_DEV_MODE", "").lower() in ("1", "true", "yes")
+MAX_BODY_BYTES = 1024 * 1024
 
 # dLocal API Configuration
 DLOCAL_API_URL = os.environ.get("DLOCAL_API_URL", "https://sandbox.dlocal.com")
@@ -38,8 +47,9 @@ DLOCAL_API_KEY = os.environ.get("DLOCAL_API_KEY", "")
 DLOCAL_SECRET_KEY = os.environ.get("DLOCAL_SECRET_KEY", "")
 DLOCAL_WEBHOOK_SECRET = os.environ.get("DLOCAL_WEBHOOK_SECRET", "")
 
-# Email notification (reuse from email_server)
-EMAIL_SERVER_URL = "http://localhost:8080/send-email"
+# Email notifications go through email_server.py (different port).
+EMAIL_SERVER_URL = os.environ.get("EMAIL_SERVER_URL", "http://127.0.0.1:8082/send-email")
+EMAIL_SERVER_TOKEN = os.environ.get("EMAIL_SERVER_TOKEN", "")
 
 
 # === Database Setup ===
@@ -604,7 +614,7 @@ class DLocalClient:
             "country": recipient.country,
             "beneficiary": beneficiary,
             "payout_method_id": "BT", # Bank Transfer
-            "notification_url": f"http://localhost:{PORT}/webhooks/dlocal",
+            "notification_url": f"{PUBLIC_BASE_URL}/webhooks/dlocal",
             "external_id": reference
         }
         
@@ -648,13 +658,48 @@ class DLocalClient:
 dlocal_client = DLocalClient()
 
 
+# === Request authentication ===
+
+def is_authorized_bearer(header: Optional[str]) -> bool:
+    """Check `Authorization: Bearer <PAYOUT_API_TOKEN>` in constant time."""
+    if not PAYOUT_API_TOKEN:
+        return DEV_MODE
+    if not header or not header.startswith("Bearer "):
+        return False
+    return hmac.compare_digest(header[len("Bearer "):].strip(), PAYOUT_API_TOKEN)
+
+
+def verify_dlocal_signature(payload: bytes, x_login: str, x_date: str, authorization: str) -> bool:
+    """Verify a dLocal notification.
+
+    dLocal signs notifications with `Authorization: V2-HMAC-SHA256, Signature: <hex>` where
+    the signature is HMAC-SHA256(secret, X-Login + X-Date + raw body). Check this against the
+    current dLocal Payouts docs when you get production credentials.
+    Without a configured secret every webhook is rejected unless PAYOUT_DEV_MODE is set.
+    """
+    secret = DLOCAL_WEBHOOK_SECRET or DLOCAL_SECRET_KEY
+    if not secret:
+        return DEV_MODE
+    marker = "Signature:"
+    if marker not in (authorization or ""):
+        return False
+    received = authorization.split(marker, 1)[1].strip()
+    message = (x_login or "").encode() + (x_date or "").encode() + payload
+    expected = hmac.new(secret.encode(), message, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(expected, received)
+
+
 # === HTTP Handler ===
 
 class PayoutHandler(BaseHTTPRequestHandler):
     
     def do_POST(self):
         path = urlparse(self.path).path
-        
+
+        if path.startswith("/api/") and not self._is_authorized():
+            self._send_response(401, {"error": "Unauthorized"})
+            return
+
         if path == "/api/recipients":
             self._handle_save_recipient()
         elif path == "/webhooks/dlocal":
@@ -662,14 +707,16 @@ class PayoutHandler(BaseHTTPRequestHandler):
         elif path.startswith("/api/payouts/") and path.endswith("/retry"):
             payout_id = path.split("/")[3]
             self._handle_retry_payout(payout_id)
-        elif path == "/send-email":
-            self._forward_to_email_server()
         else:
             self._send_response(404, {"error": "Not found"})
     
     def do_GET(self):
         path = urlparse(self.path).path
-        
+
+        if path.startswith("/api/") and not self._is_authorized():
+            self._send_response(401, {"error": "Unauthorized"})
+            return
+
         if path == "/health":
             self._send_response(200, {"status": "ok"})
         elif path.startswith("/api/recipients/claim/"):
@@ -687,8 +734,7 @@ class PayoutHandler(BaseHTTPRequestHandler):
     def _handle_save_recipient(self):
         """Handle POST /api/recipients - Save or update recipient."""
         try:
-            content_length = int(self.headers["Content-Length"])
-            post_data = self.rfile.read(content_length)
+            post_data = self._read_body()
             data = json.loads(post_data.decode("utf-8"))
             
             print(f"\n📥 Received recipient data for claim: {data.get('claimId')}")
@@ -802,17 +848,15 @@ class PayoutHandler(BaseHTTPRequestHandler):
     def _handle_dlocal_webhook(self):
         """Handle POST /webhooks/dlocal - Process dLocal webhook events."""
         try:
-            content_length = int(self.headers["Content-Length"])
-            post_data = self.rfile.read(content_length)
+            post_data = self._read_body()
+
+            if not self._verify_webhook_signature(post_data):
+                print("⛔ Webhook rejected: invalid or missing signature")
+                self._send_response(401, {"error": "Invalid signature"})
+                return
+
             payload = json.loads(post_data.decode("utf-8"))
-            
             print(f"\n📩 Received dLocal webhook: {payload.get('type')}")
-            
-            # Verify webhook signature (in production)
-            # signature = self.headers.get("X-DLocal-Signature")
-            # if not self._verify_webhook_signature(post_data, signature):
-            #     self._send_response(401, {"error": "Invalid signature"})
-            #     return
             
             event_type = payload.get("type", "unknown")
             payout_data = payload.get("data", {})
@@ -869,7 +913,7 @@ class PayoutHandler(BaseHTTPRequestHandler):
             
         except Exception as e:
             print(f"❌ Error processing webhook: {e}")
-            self._send_response(500, {"error": str(e)})
+            self._send_response(500, {"error": "Internal error"})
     
     def _send_payout_notification(self, payout: Payout):
         """Send email notification about payout status change."""
@@ -935,7 +979,7 @@ FlightCompensation Team
             req = urllib.request.Request(
                 EMAIL_SERVER_URL,
                 data=json.dumps(email_data).encode(),
-                headers={"Content-Type": "application/json"},
+                headers={"Content-Type": "application/json", "Authorization": f"Bearer {EMAIL_SERVER_TOKEN}"},
                 method="POST"
             )
             urllib.request.urlopen(req, timeout=10)
@@ -943,24 +987,23 @@ FlightCompensation Team
         except Exception as e:
             print(f"⚠️ Failed to send notification: {e}")
     
-    def _forward_to_email_server(self):
-        """Forward email requests to the email sending logic."""
-        # This is a simplified version - in production, reuse email_server.py logic
-        self._send_response(200, {"status": "ok", "message": "Email queued"})
-    
-    def _verify_webhook_signature(self, payload: bytes, signature: str) -> bool:
-        """Verify dLocal webhook signature."""
-        if not DLOCAL_WEBHOOK_SECRET or not signature:
-            return True  # Skip verification in development
-        
-        expected = hmac.new(
-            DLOCAL_WEBHOOK_SECRET.encode(),
+    def _read_body(self) -> bytes:
+        length = int(self.headers.get("Content-Length") or 0)
+        if length < 0 or length > MAX_BODY_BYTES:
+            raise ValueError("Request body too large")
+        return self.rfile.read(length)
+
+    def _is_authorized(self) -> bool:
+        return is_authorized_bearer(self.headers.get("Authorization"))
+
+    def _verify_webhook_signature(self, payload: bytes) -> bool:
+        return verify_dlocal_signature(
             payload,
-            hashlib.sha256
-        ).hexdigest()
-        
-        return hmac.compare_digest(expected, signature)
-    
+            x_login=self.headers.get("X-Login", ""),
+            x_date=self.headers.get("X-Date", ""),
+            authorization=self.headers.get("Authorization", ""),
+        )
+
     def _send_response(self, status: int, data: Dict):
         """Send JSON response."""
         self.send_response(status)
@@ -1002,7 +1045,7 @@ def main():
     print("=" * 50)
     print("🚀 Flighty Compensation Payout Server")
     print("=" * 50)
-    print(f"📡 Listening on: http://localhost:{PORT}")
+    print(f"📡 Listening on: http://{HOST}:{PORT}{'  (DEV MODE: auth disabled)' if DEV_MODE else ''}")
     print(f"💳 dLocal API: {DLOCAL_API_URL}")
     print(f"🔑 dLocal configured: {'Yes' if DLOCAL_API_KEY else 'No (sandbox mode)'}")
     print("\nEndpoints:")
@@ -1014,7 +1057,12 @@ def main():
     print(f"  GET  http://localhost:{PORT}/health")
     print("\nPress Ctrl+C to stop.\n")
     
-    server = HTTPServer(("", PORT), PayoutHandler)
+    if not DEV_MODE and (not PAYOUT_API_TOKEN or not (DLOCAL_WEBHOOK_SECRET or DLOCAL_SECRET_KEY)):
+        print("⛔ PAYOUT_API_TOKEN and DLOCAL_WEBHOOK_SECRET (or DLOCAL_SECRET_KEY) are required.")
+        print("   Set PAYOUT_DEV_MODE=1 only for local development.")
+        raise SystemExit(1)
+
+    server = HTTPServer((HOST, PORT), PayoutHandler)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
